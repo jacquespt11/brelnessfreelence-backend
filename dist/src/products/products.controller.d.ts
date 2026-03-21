@@ -1,0 +1,152 @@
+import { ProductsService } from './products.service';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
+export declare class ProductsController {
+    private productsService;
+    private cloudinaryService;
+    constructor(productsService: ProductsService, cloudinaryService: CloudinaryService);
+    findByShop(shopId: string, search?: string): Promise<{
+        id: string;
+        shopId: string;
+        name: string;
+        description: string | null;
+        price: number;
+        stock: number;
+        images: string[];
+        status: string;
+        tags: string[];
+        createdAt: Date;
+        updatedAt: Date;
+    }[]>;
+    findOne(id: string): Promise<{
+        shop: {
+            id: string;
+            name: string;
+            description: string | null;
+            status: string;
+            createdAt: Date;
+            updatedAt: Date;
+            slug: string;
+            category: string;
+            businessType: string;
+            logo: string | null;
+            banner: string | null;
+            email: string | null;
+            phone: string | null;
+            address: string | null;
+            facebook: string | null;
+            instagram: string | null;
+            twitter: string | null;
+            tiktok: string | null;
+        };
+    } & {
+        id: string;
+        shopId: string;
+        name: string;
+        description: string | null;
+        price: number;
+        stock: number;
+        images: string[];
+        status: string;
+        tags: string[];
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    create(req: any, dto: CreateProductDto): Promise<{
+        id: string;
+        shopId: string;
+        name: string;
+        description: string | null;
+        price: number;
+        stock: number;
+        images: string[];
+        status: string;
+        tags: string[];
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    update(id: string, req: any, dto: UpdateProductDto): Promise<{
+        id: string;
+        shopId: string;
+        name: string;
+        description: string | null;
+        price: number;
+        stock: number;
+        images: string[];
+        status: string;
+        tags: string[];
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    remove(id: string, req: any): Promise<{
+        id: string;
+        shopId: string;
+        name: string;
+        description: string | null;
+        price: number;
+        stock: number;
+        images: string[];
+        status: string;
+        tags: string[];
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    uploadImage(id: string, req: any, authReq: any): Promise<{
+        id: string;
+        shopId: string;
+        name: string;
+        description: string | null;
+        price: number;
+        stock: number;
+        images: string[];
+        status: string;
+        tags: string[];
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    findAll(search?: string): Promise<({
+        shop: {
+            id: string;
+            name: string;
+            slug: string;
+        };
+    } & {
+        id: string;
+        shopId: string;
+        name: string;
+        description: string | null;
+        price: number;
+        stock: number;
+        images: string[];
+        status: string;
+        tags: string[];
+        createdAt: Date;
+        updatedAt: Date;
+    })[]>;
+    adminUpdate(id: string, dto: UpdateProductDto): Promise<{
+        id: string;
+        shopId: string;
+        name: string;
+        description: string | null;
+        price: number;
+        stock: number;
+        images: string[];
+        status: string;
+        tags: string[];
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    adminRemove(id: string): Promise<{
+        id: string;
+        shopId: string;
+        name: string;
+        description: string | null;
+        price: number;
+        stock: number;
+        images: string[];
+        status: string;
+        tags: string[];
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+}

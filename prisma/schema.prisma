@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  SHOP_ADMIN
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(SHOP_ADMIN)
+  shopId    String?
+  shop      Shop?    @relation(fields: [shopId], references: [id])
+  status        String         @default("active")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  notifications Notification[]
+}
+
+model Shop {
+  id           String        @id @default(uuid())
+  slug         String        @unique
+  name         String
+  category     String
+  businessType String        @default("produits")
+  logo         String?
+  banner       String?
+  status       String        @default("active") // active, inactive, suspended
+  description  String?
+  email        String?
+  phone        String?
+  address      String?
+  facebook     String?
+  instagram    String?
+  twitter      String?
+  tiktok       String?
+  users        User[]
+  products     Product[]
+  reservations  Reservation[]
+  licenses      License[]
+  notifications Notification[]
+  reviews      Review[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model License {
+  id        String   @id @default(uuid())
+  shopId    String
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  type      String   @default("Basic") // "Basic", "Pro", etc.
+  status    String   @default("Actif") // "Actif", "Expiré"
+  startDate DateTime @default(now())
+  endDate   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id           String        @id @default(uuid())
+  shopId       String
+  shop         Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  name         String
+  description  String?
+  price        Float
+  stock        Int
+  images       String[]
+  status       String        @default("active")
+  tags         String[]
+  reservations Reservation[]
+  reviews      Review[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Reservation {
+  id           String   @id @default(uuid())
+  shopId       String
+  shop         Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id])
+  customerName String
+  quantity     Int
+  status       String   @default("PENDING")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String?  
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shopId    String?
+  shop      Shop?    @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   @default("system") // "reservation", "license", "shop", "system"
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model SystemSettings {
+  id              String   @id @default(uuid())
+  platformName    String   @default("Brelness")
+  contactEmail    String   @default("admin@brelness.com")
+  contactPhone    String?
+  logoUrl         String?
+  maintenanceMode Boolean  @default(false)
+  updatedAt       DateTime @updatedAt
+}
+
+model Review {
+  id           String   @id @default(uuid())
+  shopId       String
+  shop         Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  productId    String?
+  product      Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  customerName String
+  rating       Float
+  comment      String?
+  status       String   @default("published")
+  createdAt    DateTime @default(now())
+}

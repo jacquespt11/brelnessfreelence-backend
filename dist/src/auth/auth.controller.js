@@ -77,6 +77,9 @@ let AuthController = class AuthController {
     deleteUser(id) {
         return this.authService.deleteUser(id);
     }
+    getMe(req) {
+        return this.authService.getMe(req.user.userId);
+    }
 };
 exports.AuthController = AuthController;
 __decorate([
@@ -150,6 +153,16 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "deleteUser", null);
+__decorate([
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtenir les infos de l\'utilisateur connecté' }),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
+    (0, common_1.Get)('me'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "getMe", null);
 exports.AuthController = AuthController = __decorate([
     (0, swagger_1.ApiTags)('auth'),
     (0, common_1.Controller)('auth'),

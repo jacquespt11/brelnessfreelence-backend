@@ -11,12 +11,13 @@ const common_1 = require("@nestjs/common");
 const settings_service_1 = require("./settings.service");
 const settings_controller_1 = require("./settings.controller");
 const prisma_module_1 = require("../prisma/prisma.module");
+const notifications_module_1 = require("../notifications/notifications.module");
 let SettingsModule = class SettingsModule {
 };
 exports.SettingsModule = SettingsModule;
 exports.SettingsModule = SettingsModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule],
+        imports: [prisma_module_1.PrismaModule, notifications_module_1.NotificationsModule],
         controllers: [settings_controller_1.SettingsController],
         providers: [settings_service_1.SettingsService],
     })

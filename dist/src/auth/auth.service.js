@@ -47,12 +47,15 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const prisma_service_1 = require("../prisma/prisma.service");
 const bcrypt = __importStar(require("bcryptjs"));
+const notifications_gateway_1 = require("../notifications/notifications.gateway");
 let AuthService = class AuthService {
     prisma;
     jwtService;
-    constructor(prisma, jwtService) {
+    notifications;
+    constructor(prisma, jwtService, notifications) {
         this.prisma = prisma;
         this.jwtService = jwtService;
+        this.notifications = notifications;
     }
     async register(email, password, name) {
         const existing = await this.prisma.user.findUnique({ where: { email } });
@@ -99,7 +102,7 @@ let AuthService = class AuthService {
         if (existing)
             throw new common_1.ConflictException('Email déjà utilisé');
         const hashedPassword = await bcrypt.hash(data.password || 'password123', 10);
-        return this.prisma.user.create({
+        const user = await this.prisma.user.create({
             data: {
                 email: data.email,
                 password: hashedPassword,
@@ -109,6 +112,15 @@ let AuthService = class AuthService {
                 role: 'SHOP_ADMIN',
             },
         });
+        this.notifications.notifySuperAdmins('admin_created', user);
+        await this.prisma.notification.create({
+            data: {
+                title: 'Nouvel Administrateur',
+                message: `L'administrateur "${user.name}" a été ajouté.`,
+                type: 'system',
+            }
+        });
+        return user;
     }
     async updateUser(id, data) {
         if (data.email) {
@@ -119,6 +131,8 @@ let AuthService = class AuthService {
         const updateData = {
             name: data.name,
             email: data.email,
+            phone: data.phone,
+            avatar: data.avatar,
             shopId: data.shopId,
             status: data.status,
         };
@@ -142,11 +156,27 @@ let AuthService = class AuthService {
     async deleteUser(id) {
         return this.prisma.user.delete({ where: { id } });
     }
+    async getMe(id) {
+        return this.prisma.user.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                role: true,
+                shopId: true,
+                status: true,
+                phone: true,
+                avatar: true,
+            }
+        });
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        notifications_gateway_1.NotificationsGateway])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

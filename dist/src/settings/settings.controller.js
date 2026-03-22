@@ -39,6 +39,7 @@ __decorate([
 ], SettingsController.prototype, "getSettings", null);
 __decorate([
     (0, common_1.Patch)(),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('SUPER_ADMIN'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -47,7 +48,6 @@ __decorate([
 ], SettingsController.prototype, "updateSettings", null);
 exports.SettingsController = SettingsController = __decorate([
     (0, common_1.Controller)('settings'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
     __metadata("design:paramtypes", [settings_service_1.SettingsService])
 ], SettingsController);
 //# sourceMappingURL=settings.controller.js.map

@@ -86,6 +86,8 @@ class UpdateShopDto {
     instagram;
     twitter;
     tiktok;
+    heroTitle;
+    heroImages;
 }
 exports.UpdateShopDto = UpdateShopDto;
 __decorate([
@@ -172,4 +174,16 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UpdateShopDto.prototype, "tiktok", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateShopDto.prototype, "heroTitle", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)({ each: true }),
+    __metadata("design:type", Array)
+], UpdateShopDto.prototype, "heroImages", void 0);
 //# sourceMappingURL=shop.dto.js.map

@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Param, Body, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from './roles.guard';
@@ -9,23 +9,23 @@ import { IsEmail, IsString, MinLength } from 'class-validator';
 
 class LoginDto {
   @IsEmail()
-  email: string;
+  email!: string;
 
   @IsString()
   @MinLength(1)
-  password: string;
+  password!: string;
 }
 
 class RegisterDto {
   @IsEmail()
-  email: string;
+  email!: string;
 
   @IsString()
   @MinLength(6)
-  password: string;
+  password!: string;
 
   @IsString()
-  name: string;
+  name!: string;
 }
 
 @ApiTags('auth')
@@ -88,5 +88,13 @@ export class AuthController {
   @Delete('users/:id')
   deleteUser(@Param('id') id: string) {
     return this.authService.deleteUser(id);
+  }
+
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Obtenir les infos de l\'utilisateur connecté' })
+  @UseGuards(AuthGuard('jwt'))
+  @Get('me')
+  getMe(@Request() req: any) {
+    return this.authService.getMe(req.user.userId);
   }
 }

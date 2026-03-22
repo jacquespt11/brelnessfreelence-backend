@@ -33,9 +33,11 @@ export declare class AuthController {
     }>;
     findAll(): Promise<({
         shop: {
+            description: string | null;
             id: string;
             email: string | null;
             name: string;
+            phone: string | null;
             status: string;
             createdAt: Date;
             updatedAt: Date;
@@ -44,8 +46,8 @@ export declare class AuthController {
             businessType: string;
             logo: string | null;
             banner: string | null;
-            description: string | null;
-            phone: string | null;
+            heroTitle: string | null;
+            heroImages: string[];
             address: string | null;
             facebook: string | null;
             instagram: string | null;
@@ -57,6 +59,8 @@ export declare class AuthController {
         email: string;
         password: string;
         name: string;
+        phone: string | null;
+        avatar: string | null;
         role: import("@prisma/client").$Enums.Role;
         shopId: string | null;
         status: string;
@@ -68,6 +72,8 @@ export declare class AuthController {
         email: string;
         password: string;
         name: string;
+        phone: string | null;
+        avatar: string | null;
         role: import("@prisma/client").$Enums.Role;
         shopId: string | null;
         status: string;
@@ -79,6 +85,8 @@ export declare class AuthController {
         email: string;
         password: string;
         name: string;
+        phone: string | null;
+        avatar: string | null;
         role: import("@prisma/client").$Enums.Role;
         shopId: string | null;
         status: string;
@@ -90,6 +98,8 @@ export declare class AuthController {
         email: string;
         password: string;
         name: string;
+        phone: string | null;
+        avatar: string | null;
         role: import("@prisma/client").$Enums.Role;
         shopId: string | null;
         status: string;
@@ -101,11 +111,23 @@ export declare class AuthController {
         email: string;
         password: string;
         name: string;
+        phone: string | null;
+        avatar: string | null;
         role: import("@prisma/client").$Enums.Role;
         shopId: string | null;
         status: string;
         createdAt: Date;
         updatedAt: Date;
     }>;
+    getMe(req: any): Promise<{
+        id: string;
+        email: string;
+        name: string;
+        phone: string | null;
+        avatar: string | null;
+        role: import("@prisma/client").$Enums.Role;
+        shopId: string | null;
+        status: string;
+    } | null>;
 }
 export {};

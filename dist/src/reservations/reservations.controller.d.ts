@@ -4,14 +4,16 @@ export declare class ReservationsController {
     private reservationsService;
     constructor(reservationsService: ReservationsService);
     create(shopId: string, dto: CreateReservationDto): Promise<{
-        productId: string;
-        customerName: string;
-        quantity: number;
-        status: string;
         id: string;
         shopId: string;
+        status: string;
         createdAt: Date;
         updatedAt: Date;
+        productId: string;
+        customerName: string;
+        customerPhone: string | null;
+        customerEmail: string | null;
+        quantity: number;
     }>;
     findMyShopReservations(req: any): Promise<({
         product: {
@@ -20,34 +22,41 @@ export declare class ReservationsController {
             images: string[];
         };
     } & {
-        productId: string;
-        customerName: string;
-        quantity: number;
-        status: string;
         id: string;
         shopId: string;
+        status: string;
         createdAt: Date;
         updatedAt: Date;
+        productId: string;
+        customerName: string;
+        customerPhone: string | null;
+        customerEmail: string | null;
+        quantity: number;
     })[]>;
+    findMyShopCustomers(req: any): Promise<any[]>;
     updateStatus(id: string, req: any, dto: UpdateReservationStatusDto): Promise<{
-        productId: string;
-        customerName: string;
-        quantity: number;
-        status: string;
         id: string;
         shopId: string;
+        status: string;
         createdAt: Date;
         updatedAt: Date;
+        productId: string;
+        customerName: string;
+        customerPhone: string | null;
+        customerEmail: string | null;
+        quantity: number;
     }>;
     remove(id: string, req: any): Promise<{
-        productId: string;
-        customerName: string;
-        quantity: number;
-        status: string;
         id: string;
         shopId: string;
+        status: string;
         createdAt: Date;
         updatedAt: Date;
+        productId: string;
+        customerName: string;
+        customerPhone: string | null;
+        customerEmail: string | null;
+        quantity: number;
     }>;
     findAllGlobal(): Promise<({
         shop: {
@@ -58,13 +67,15 @@ export declare class ReservationsController {
             name: string;
         };
     } & {
-        productId: string;
-        customerName: string;
-        quantity: number;
-        status: string;
         id: string;
         shopId: string;
+        status: string;
         createdAt: Date;
         updatedAt: Date;
+        productId: string;
+        customerName: string;
+        customerPhone: string | null;
+        customerEmail: string | null;
+        quantity: number;
     })[]>;
 }

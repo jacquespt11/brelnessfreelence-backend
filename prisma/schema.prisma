@@ -17,6 +17,8 @@ model User {
   email     String   @unique
   password  String
   name      String
+  phone     String?
+  avatar    String?
   role      Role     @default(SHOP_ADMIN)
   shopId    String?
   shop      Shop?    @relation(fields: [shopId], references: [id])
@@ -34,6 +36,8 @@ model Shop {
   businessType String        @default("produits")
   logo         String?
   banner       String?
+  heroTitle    String?
+  heroImages   String[]
   status       String        @default("active") // active, inactive, suspended
   description  String?
   email        String?
@@ -89,6 +93,8 @@ model Reservation {
   productId    String
   product      Product  @relation(fields: [productId], references: [id])
   customerName String
+  customerPhone String?
+  customerEmail String?
   quantity     Int
   status       String   @default("PENDING")
   createdAt    DateTime @default(now())

@@ -2,12 +2,14 @@ import { Injectable, UnauthorizedException, ConflictException, BadRequestExcepti
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
+import { NotificationsGateway } from '../notifications/notifications.gateway';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private notifications: NotificationsGateway,
   ) {}
 
   async register(email: string, password: string, name: string) {
@@ -60,7 +62,7 @@ export class AuthService {
     if (existing) throw new ConflictException('Email déjà utilisé');
 
     const hashedPassword = await bcrypt.hash(data.password || 'password123', 10);
-    return this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: {
         email: data.email,
         password: hashedPassword,
@@ -70,6 +72,17 @@ export class AuthService {
         role: 'SHOP_ADMIN',
       },
     });
+
+    this.notifications.notifySuperAdmins('admin_created', user);
+    await this.prisma.notification.create({
+      data: {
+        title: 'Nouvel Administrateur',
+        message: `L'administrateur "${user.name}" a été ajouté.`,
+        type: 'system',
+      }
+    });
+
+    return user;
   }
 
   async updateUser(id: string, data: { name?: string; email?: string; shopId?: string; status?: string; password?: string }) {
@@ -81,6 +94,8 @@ export class AuthService {
     const updateData: any = {
       name: data.name,
       email: data.email,
+      phone: (data as any).phone,
+      avatar: (data as any).avatar,
       shopId: data.shopId,
       status: data.status,
     };
@@ -106,5 +121,21 @@ export class AuthService {
 
   async deleteUser(id: string) {
     return this.prisma.user.delete({ where: { id } });
+  }
+
+  async getMe(id: string) {
+    return this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        shopId: true,
+        status: true,
+        phone: true,
+        avatar: true,
+      }
+    });
   }
 }

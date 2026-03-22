@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateShopDto, UpdateShopDto } from './dto/shop.dto';
+import { NotificationsGateway } from '../notifications/notifications.gateway';
 
 @Injectable()
 export class ShopsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notifications: NotificationsGateway,
+  ) {}
 
   // Super Admin: list all shops
   async findAll(search?: string) {
@@ -74,6 +78,16 @@ export class ShopsService {
       }
     });
 
+    // Notify Super Admin
+    this.notifications.notifySuperAdmins('shop_created', shop);
+    await this.prisma.notification.create({
+      data: {
+        title: 'Nouvelle Boutique',
+        message: `La boutique "${shop.name}" vient d'être créée.`,
+        type: 'shop',
+      }
+    });
+
     return {
       ...shop,
       license: shop.licenses?.[0] || null
@@ -96,10 +110,21 @@ export class ShopsService {
   // Super Admin: toggle shop status
   async toggleStatus(id: string) {
     const shop = await this.findOne(id);
-    return this.prisma.shop.update({
+    const updated = await this.prisma.shop.update({
       where: { id },
       data: { status: shop.status === 'active' ? 'inactive' : 'active' },
     });
+
+    this.notifications.notifySuperAdmins('shop_updated', updated);
+    await this.prisma.notification.create({
+      data: {
+        title: 'Statut Boutique Modifié',
+        message: `La boutique "${shop.name}" est maintenant ${updated.status}.`,
+        type: 'shop',
+      }
+    });
+
+    return updated;
   }
 
   // Super Admin: delete a shop
@@ -111,7 +136,7 @@ export class ShopsService {
   // Super Admin: renew license
   async renewLicense(shopId: string, type: string, days: number) {
     const newExpiry = new Date(Date.now() + days * 86400000);
-    return this.prisma.license.create({
+    const res = await this.prisma.license.create({
       data: {
         shopId,
         type,
@@ -120,6 +145,17 @@ export class ShopsService {
         endDate: newExpiry
       }
     });
+
+    this.notifications.notifySuperAdmins('license_renewed', { shopId, type, newExpiry });
+    await this.prisma.notification.create({
+      data: {
+        title: 'Licence Renouvelée',
+        message: `Nouvelle licence "${type}" pour la boutique ID: ${shopId}.`,
+        type: 'license',
+      }
+    });
+
+    return res;
   }
 
   // Super Admin: cancel license
@@ -128,7 +164,18 @@ export class ShopsService {
     if (latest) {
       await this.prisma.license.update({ where: { id: latest.id }, data: { status: 'Annulé' } });
     }
-    return this.prisma.shop.update({ where: { id: shopId }, data: { status: 'inactive' } });
+    const updatedShop = await this.prisma.shop.update({ where: { id: shopId }, data: { status: 'inactive' } });
+
+    this.notifications.notifySuperAdmins('license_cancelled', { shopId });
+    await this.prisma.notification.create({
+      data: {
+        title: 'Licence Annulée',
+        message: `La licence de la boutique "${updatedShop.name}" a été annulée.`,
+        type: 'license',
+      }
+    });
+
+    return updatedShop;
   }
 
   // Shop Admin: get their own shop (by shopId from JWT)

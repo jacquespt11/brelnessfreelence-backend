@@ -1,9 +1,11 @@
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationsGateway } from '../notifications/notifications.gateway';
 export declare class AuthService {
     private prisma;
     private jwtService;
-    constructor(prisma: PrismaService, jwtService: JwtService);
+    private notifications;
+    constructor(prisma: PrismaService, jwtService: JwtService, notifications: NotificationsGateway);
     register(email: string, password: string, name: string): Promise<{
         access_token: string;
         user: {
@@ -27,9 +29,11 @@ export declare class AuthService {
     private issueToken;
     findAll(): Promise<({
         shop: {
+            description: string | null;
             id: string;
             email: string | null;
             name: string;
+            phone: string | null;
             status: string;
             createdAt: Date;
             updatedAt: Date;
@@ -38,8 +42,8 @@ export declare class AuthService {
             businessType: string;
             logo: string | null;
             banner: string | null;
-            description: string | null;
-            phone: string | null;
+            heroTitle: string | null;
+            heroImages: string[];
             address: string | null;
             facebook: string | null;
             instagram: string | null;
@@ -51,6 +55,8 @@ export declare class AuthService {
         email: string;
         password: string;
         name: string;
+        phone: string | null;
+        avatar: string | null;
         role: import("@prisma/client").$Enums.Role;
         shopId: string | null;
         status: string;
@@ -68,6 +74,8 @@ export declare class AuthService {
         email: string;
         password: string;
         name: string;
+        phone: string | null;
+        avatar: string | null;
         role: import("@prisma/client").$Enums.Role;
         shopId: string | null;
         status: string;
@@ -85,6 +93,8 @@ export declare class AuthService {
         email: string;
         password: string;
         name: string;
+        phone: string | null;
+        avatar: string | null;
         role: import("@prisma/client").$Enums.Role;
         shopId: string | null;
         status: string;
@@ -96,6 +106,8 @@ export declare class AuthService {
         email: string;
         password: string;
         name: string;
+        phone: string | null;
+        avatar: string | null;
         role: import("@prisma/client").$Enums.Role;
         shopId: string | null;
         status: string;
@@ -107,10 +119,22 @@ export declare class AuthService {
         email: string;
         password: string;
         name: string;
+        phone: string | null;
+        avatar: string | null;
         role: import("@prisma/client").$Enums.Role;
         shopId: string | null;
         status: string;
         createdAt: Date;
         updatedAt: Date;
     }>;
+    getMe(id: string): Promise<{
+        id: string;
+        email: string;
+        name: string;
+        phone: string | null;
+        avatar: string | null;
+        role: import("@prisma/client").$Enums.Role;
+        shopId: string | null;
+        status: string;
+    } | null>;
 }

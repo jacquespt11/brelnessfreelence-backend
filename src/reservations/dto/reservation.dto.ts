@@ -13,22 +13,32 @@ export class CreateReservationDto {
   @ApiProperty({ example: 'prod-uuid' })
   @IsString()
   @IsNotEmpty()
-  productId: string;
+  productId!: string;
 
   @ApiProperty({ example: 'Jean Dupont' })
   @IsString()
   @IsNotEmpty()
-  customerName: string;
+  customerName!: string;
+
+  @ApiProperty({ example: '+243000000000' })
+  @IsString()
+  @IsNotEmpty()
+  customerPhone!: string;
+
+  @ApiPropertyOptional({ example: 'jean.dupont@example.com' })
+  @IsOptional()
+  @IsString()
+  customerEmail?: string;
 
   @ApiProperty({ example: 2 })
   @Type(() => Number)
   @IsNumber()
   @Min(1)
-  quantity: number;
+  quantity!: number;
 }
 
 export class UpdateReservationStatusDto {
   @ApiProperty({ enum: ReservationStatus })
   @IsEnum(ReservationStatus)
-  status: ReservationStatus;
+  status!: ReservationStatus;
 }

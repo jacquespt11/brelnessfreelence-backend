@@ -23,6 +23,8 @@ var ReservationStatus;
 class CreateReservationDto {
     productId;
     customerName;
+    customerPhone;
+    customerEmail;
     quantity;
 }
 exports.CreateReservationDto = CreateReservationDto;
@@ -38,6 +40,18 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateReservationDto.prototype, "customerName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '+243000000000' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateReservationDto.prototype, "customerPhone", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'jean.dupont@example.com' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateReservationDto.prototype, "customerEmail", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 2 }),
     (0, class_transformer_1.Type)(() => Number),

@@ -35,6 +35,8 @@ let ReservationsService = class ReservationsService {
                     shopId,
                     productId: dto.productId,
                     customerName: dto.customerName,
+                    customerPhone: dto.customerPhone,
+                    customerEmail: dto.customerEmail,
                     quantity: dto.quantity,
                     status: reservation_dto_1.ReservationStatus.PENDING,
                 },
@@ -44,19 +46,11 @@ let ReservationsService = class ReservationsService {
                 data: { stock: { decrement: dto.quantity } },
             });
             this.notifications.notifyShopAdmin(shopId, 'new_reservation', reservation);
-            this.notifications.notifySuperAdmins('new_global_reservation', reservation);
             await tx.notification.create({
                 data: {
                     shopId,
                     title: 'Nouvelle réservation',
                     message: `Réservation pour ${product.name} par ${dto.customerName}`,
-                    type: 'reservation',
-                }
-            });
-            await tx.notification.create({
-                data: {
-                    title: 'Nouvelle réservation (Global)',
-                    message: `Réservation dans la boutique pour ${product.name}`,
                     type: 'reservation',
                 }
             });
@@ -66,9 +60,47 @@ let ReservationsService = class ReservationsService {
     async findByShop(shopId) {
         return this.prisma.reservation.findMany({
             where: { shopId },
-            include: { product: { select: { name: true, price: true, images: true } } },
+            include: {
+                product: { select: { name: true, price: true, images: true } }
+            },
             orderBy: { createdAt: 'desc' },
         });
+    }
+    async getShopCustomers(shopId) {
+        const reservations = await this.prisma.reservation.findMany({
+            where: { shopId },
+            include: { product: true },
+        });
+        const customerMap = new Map();
+        reservations.forEach(res => {
+            const phone = res.customerPhone || 'Unknown';
+            if (!customerMap.has(phone)) {
+                customerMap.set(phone, {
+                    name: res.customerName,
+                    phone: res.customerPhone,
+                    email: res.customerEmail,
+                    reservationsCount: 0,
+                    totalGenerated: 0,
+                    lastActivity: res.createdAt,
+                    status: 'Inactif',
+                });
+            }
+            const client = customerMap.get(phone);
+            client.reservationsCount += 1;
+            if (res.status === 'COMPLETED' && res.product) {
+                client.totalGenerated += (res.product.price * res.quantity);
+            }
+            if (new Date(res.createdAt) > new Date(client.lastActivity)) {
+                client.lastActivity = res.createdAt;
+                client.name = res.customerName;
+            }
+        });
+        const now = new Date();
+        const thirtyDaysAgo = new Date(now.setDate(now.getDate() - 30));
+        return Array.from(customerMap.values()).map(c => ({
+            ...c,
+            status: new Date(c.lastActivity) > thirtyDaysAgo ? 'Actif' : 'Inactif'
+        }));
     }
     async updateStatus(id, shopId, dto) {
         const reservation = await this.prisma.reservation.findUnique({ where: { id } });

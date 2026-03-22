@@ -31,6 +31,9 @@ let ReservationsController = class ReservationsController {
     findMyShopReservations(req) {
         return this.reservationsService.findByShop(req.user.shopId);
     }
+    findMyShopCustomers(req) {
+        return this.reservationsService.getShopCustomers(req.user.shopId);
+    }
     updateStatus(id, req, dto) {
         return this.reservationsService.updateStatus(id, req.user.shopId, dto);
     }
@@ -62,6 +65,17 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], ReservationsController.prototype, "findMyShopReservations", null);
+__decorate([
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get shop customers (SHOP_ADMIN)' }),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('SHOP_ADMIN'),
+    (0, common_1.Get)('customers'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], ReservationsController.prototype, "findMyShopCustomers", null);
 __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Update reservation status (SHOP_ADMIN)' }),

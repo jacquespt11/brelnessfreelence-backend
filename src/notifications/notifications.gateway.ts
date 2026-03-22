@@ -17,7 +17,7 @@ import { JwtService } from '@nestjs/jwt';
 })
 export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
-  server: Server;
+  server!: Server;
 
   constructor(private jwtService: JwtService) {}
 
@@ -36,7 +36,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
       }
       
       console.log(`Client connected: ${client.id} (User: ${payload.email})`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Socket connection error:', error.message);
       client.disconnect();
     }

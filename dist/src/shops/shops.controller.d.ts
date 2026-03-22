@@ -4,9 +4,11 @@ export declare class ShopsController {
     private shopsService;
     constructor(shopsService: ShopsService);
     findBySlug(slug: string): Promise<{
+        description: string | null;
         id: string;
         email: string | null;
         name: string;
+        phone: string | null;
         status: string;
         createdAt: Date;
         updatedAt: Date;
@@ -15,8 +17,8 @@ export declare class ShopsController {
         businessType: string;
         logo: string | null;
         banner: string | null;
-        description: string | null;
-        phone: string | null;
+        heroTitle: string | null;
+        heroImages: string[];
         address: string | null;
         facebook: string | null;
         instagram: string | null;
@@ -34,6 +36,10 @@ export declare class ShopsController {
             startDate: Date;
             endDate: Date;
         };
+        _count: {
+            products: number;
+            reservations: number;
+        };
         users: {
             id: string;
             email: string;
@@ -50,13 +56,11 @@ export declare class ShopsController {
             startDate: Date;
             endDate: Date;
         }[];
-        _count: {
-            products: number;
-            reservations: number;
-        };
+        description: string | null;
         id: string;
         email: string | null;
         name: string;
+        phone: string | null;
         status: string;
         createdAt: Date;
         updatedAt: Date;
@@ -65,8 +69,8 @@ export declare class ShopsController {
         businessType: string;
         logo: string | null;
         banner: string | null;
-        description: string | null;
-        phone: string | null;
+        heroTitle: string | null;
+        heroImages: string[];
         address: string | null;
         facebook: string | null;
         instagram: string | null;
@@ -84,6 +88,10 @@ export declare class ShopsController {
             startDate: Date;
             endDate: Date;
         };
+        _count: {
+            products: number;
+            reservations: number;
+        };
         users: {
             id: string;
             email: string;
@@ -100,13 +108,11 @@ export declare class ShopsController {
             startDate: Date;
             endDate: Date;
         }[];
-        _count: {
-            products: number;
-            reservations: number;
-        };
+        description: string | null;
         id: string;
         email: string | null;
         name: string;
+        phone: string | null;
         status: string;
         createdAt: Date;
         updatedAt: Date;
@@ -115,8 +121,8 @@ export declare class ShopsController {
         businessType: string;
         logo: string | null;
         banner: string | null;
-        description: string | null;
-        phone: string | null;
+        heroTitle: string | null;
+        heroImages: string[];
         address: string | null;
         facebook: string | null;
         instagram: string | null;
@@ -134,6 +140,10 @@ export declare class ShopsController {
             startDate: Date;
             endDate: Date;
         };
+        _count: {
+            products: number;
+            reservations: number;
+        };
         users: {
             id: string;
             email: string;
@@ -150,13 +160,11 @@ export declare class ShopsController {
             startDate: Date;
             endDate: Date;
         }[];
-        _count: {
-            products: number;
-            reservations: number;
-        };
+        description: string | null;
         id: string;
         email: string | null;
         name: string;
+        phone: string | null;
         status: string;
         createdAt: Date;
         updatedAt: Date;
@@ -165,8 +173,8 @@ export declare class ShopsController {
         businessType: string;
         logo: string | null;
         banner: string | null;
-        description: string | null;
-        phone: string | null;
+        heroTitle: string | null;
+        heroImages: string[];
         address: string | null;
         facebook: string | null;
         instagram: string | null;
@@ -174,9 +182,11 @@ export declare class ShopsController {
         tiktok: string | null;
     }>;
     update(id: string, dto: UpdateShopDto): Promise<{
+        description: string | null;
         id: string;
         email: string | null;
         name: string;
+        phone: string | null;
         status: string;
         createdAt: Date;
         updatedAt: Date;
@@ -185,8 +195,8 @@ export declare class ShopsController {
         businessType: string;
         logo: string | null;
         banner: string | null;
-        description: string | null;
-        phone: string | null;
+        heroTitle: string | null;
+        heroImages: string[];
         address: string | null;
         facebook: string | null;
         instagram: string | null;
@@ -194,9 +204,11 @@ export declare class ShopsController {
         tiktok: string | null;
     }>;
     toggleStatus(id: string): Promise<{
+        description: string | null;
         id: string;
         email: string | null;
         name: string;
+        phone: string | null;
         status: string;
         createdAt: Date;
         updatedAt: Date;
@@ -205,8 +217,8 @@ export declare class ShopsController {
         businessType: string;
         logo: string | null;
         banner: string | null;
-        description: string | null;
-        phone: string | null;
+        heroTitle: string | null;
+        heroImages: string[];
         address: string | null;
         facebook: string | null;
         instagram: string | null;
@@ -214,9 +226,11 @@ export declare class ShopsController {
         tiktok: string | null;
     }>;
     remove(id: string): Promise<{
+        description: string | null;
         id: string;
         email: string | null;
         name: string;
+        phone: string | null;
         status: string;
         createdAt: Date;
         updatedAt: Date;
@@ -225,8 +239,8 @@ export declare class ShopsController {
         businessType: string;
         logo: string | null;
         banner: string | null;
-        description: string | null;
-        phone: string | null;
+        heroTitle: string | null;
+        heroImages: string[];
         address: string | null;
         facebook: string | null;
         instagram: string | null;
@@ -244,9 +258,11 @@ export declare class ShopsController {
         endDate: Date;
     }>;
     cancelLicense(id: string): Promise<{
+        description: string | null;
         id: string;
         email: string | null;
         name: string;
+        phone: string | null;
         status: string;
         createdAt: Date;
         updatedAt: Date;
@@ -255,8 +271,8 @@ export declare class ShopsController {
         businessType: string;
         logo: string | null;
         banner: string | null;
-        description: string | null;
-        phone: string | null;
+        heroTitle: string | null;
+        heroImages: string[];
         address: string | null;
         facebook: string | null;
         instagram: string | null;
@@ -274,6 +290,10 @@ export declare class ShopsController {
             startDate: Date;
             endDate: Date;
         };
+        _count: {
+            products: number;
+            reservations: number;
+        };
         users: {
             id: string;
             email: string;
@@ -290,13 +310,11 @@ export declare class ShopsController {
             startDate: Date;
             endDate: Date;
         }[];
-        _count: {
-            products: number;
-            reservations: number;
-        };
+        description: string | null;
         id: string;
         email: string | null;
         name: string;
+        phone: string | null;
         status: string;
         createdAt: Date;
         updatedAt: Date;
@@ -305,8 +323,8 @@ export declare class ShopsController {
         businessType: string;
         logo: string | null;
         banner: string | null;
-        description: string | null;
-        phone: string | null;
+        heroTitle: string | null;
+        heroImages: string[];
         address: string | null;
         facebook: string | null;
         instagram: string | null;
@@ -314,9 +332,11 @@ export declare class ShopsController {
         tiktok: string | null;
     }>;
     updateMyShop(req: any, dto: UpdateShopDto): Promise<{
+        description: string | null;
         id: string;
         email: string | null;
         name: string;
+        phone: string | null;
         status: string;
         createdAt: Date;
         updatedAt: Date;
@@ -325,8 +345,8 @@ export declare class ShopsController {
         businessType: string;
         logo: string | null;
         banner: string | null;
-        description: string | null;
-        phone: string | null;
+        heroTitle: string | null;
+        heroImages: string[];
         address: string | null;
         facebook: string | null;
         instagram: string | null;

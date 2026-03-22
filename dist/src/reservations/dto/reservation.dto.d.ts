@@ -7,6 +7,8 @@ export declare enum ReservationStatus {
 export declare class CreateReservationDto {
     productId: string;
     customerName: string;
+    customerPhone: string;
+    customerEmail?: string;
     quantity: number;
 }
 export declare class UpdateReservationStatusDto {

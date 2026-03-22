@@ -12,10 +12,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SettingsService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const notifications_gateway_1 = require("../notifications/notifications.gateway");
 let SettingsService = class SettingsService {
     prisma;
-    constructor(prisma) {
+    notifications;
+    constructor(prisma, notifications) {
         this.prisma = prisma;
+        this.notifications = notifications;
     }
     async getSettings() {
         let settings = await this.prisma.systemSettings.findFirst();
@@ -28,15 +31,25 @@ let SettingsService = class SettingsService {
     }
     async updateSettings(data) {
         const settings = await this.getSettings();
-        return this.prisma.systemSettings.update({
+        const updated = await this.prisma.systemSettings.update({
             where: { id: settings.id },
             data
         });
+        this.notifications.notifySuperAdmins('system_updated', updated);
+        await this.prisma.notification.create({
+            data: {
+                title: 'Système Mis à Jour',
+                message: 'Les paramètres de la plateforme ont été modifiés.',
+                type: 'system',
+            }
+        });
+        return updated;
     }
 };
 exports.SettingsService = SettingsService;
 exports.SettingsService = SettingsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        notifications_gateway_1.NotificationsGateway])
 ], SettingsService);
 //# sourceMappingURL=settings.service.js.map

@@ -23,4 +23,6 @@ export declare class UpdateShopDto {
     instagram?: string;
     twitter?: string;
     tiktok?: string;
+    heroTitle?: string;
+    heroImages?: string[];
 }

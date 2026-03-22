@@ -59,4 +59,7 @@ export class UpdateShopDto {
   @ApiPropertyOptional() @IsOptional() @IsString() instagram?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() twitter?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() tiktok?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() heroTitle?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString({ each: true }) heroImages?: string[];
 }
+

@@ -39,6 +39,15 @@ export class ReservationsController {
   }
 
   @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get shop customers (SHOP_ADMIN)' })
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('SHOP_ADMIN')
+  @Get('customers')
+  findMyShopCustomers(@Request() req: any) {
+    return this.reservationsService.getShopCustomers(req.user.shopId);
+  }
+
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update reservation status (SHOP_ADMIN)' })
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('SHOP_ADMIN')

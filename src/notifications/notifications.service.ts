@@ -8,7 +8,10 @@ export class NotificationsService {
   async findAll(user: any) {
     if (user.role === 'SUPER_ADMIN') {
       return this.prisma.notification.findMany({ 
-        where: { shopId: null }, 
+        where: { 
+          shopId: null,
+          type: { not: 'reservation' }
+        }, 
         orderBy: { createdAt: 'desc' } 
       });
     }
@@ -28,7 +31,11 @@ export class NotificationsService {
   async markAllAsRead(user: any) {
     if (user.role === 'SUPER_ADMIN') {
       return this.prisma.notification.updateMany({ 
-        where: { shopId: null, isRead: false }, 
+        where: { 
+          shopId: null, 
+          isRead: false,
+          type: { not: 'reservation' }
+        }, 
         data: { isRead: true } 
       });
     }

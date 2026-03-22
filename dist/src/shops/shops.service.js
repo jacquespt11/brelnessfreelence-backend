@@ -12,10 +12,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ShopsService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const notifications_gateway_1 = require("../notifications/notifications.gateway");
 let ShopsService = class ShopsService {
     prisma;
-    constructor(prisma) {
+    notifications;
+    constructor(prisma, notifications) {
         this.prisma = prisma;
+        this.notifications = notifications;
     }
     async findAll(search) {
         const shops = await this.prisma.shop.findMany({
@@ -77,6 +80,14 @@ let ShopsService = class ShopsService {
                 licenses: { orderBy: { createdAt: 'desc' }, take: 1 }
             }
         });
+        this.notifications.notifySuperAdmins('shop_created', shop);
+        await this.prisma.notification.create({
+            data: {
+                title: 'Nouvelle Boutique',
+                message: `La boutique "${shop.name}" vient d'être créée.`,
+                type: 'shop',
+            }
+        });
         return {
             ...shop,
             license: shop.licenses?.[0] || null
@@ -93,10 +104,19 @@ let ShopsService = class ShopsService {
     }
     async toggleStatus(id) {
         const shop = await this.findOne(id);
-        return this.prisma.shop.update({
+        const updated = await this.prisma.shop.update({
             where: { id },
             data: { status: shop.status === 'active' ? 'inactive' : 'active' },
         });
+        this.notifications.notifySuperAdmins('shop_updated', updated);
+        await this.prisma.notification.create({
+            data: {
+                title: 'Statut Boutique Modifié',
+                message: `La boutique "${shop.name}" est maintenant ${updated.status}.`,
+                type: 'shop',
+            }
+        });
+        return updated;
     }
     async remove(id) {
         await this.findOne(id);
@@ -104,7 +124,7 @@ let ShopsService = class ShopsService {
     }
     async renewLicense(shopId, type, days) {
         const newExpiry = new Date(Date.now() + days * 86400000);
-        return this.prisma.license.create({
+        const res = await this.prisma.license.create({
             data: {
                 shopId,
                 type,
@@ -113,13 +133,31 @@ let ShopsService = class ShopsService {
                 endDate: newExpiry
             }
         });
+        this.notifications.notifySuperAdmins('license_renewed', { shopId, type, newExpiry });
+        await this.prisma.notification.create({
+            data: {
+                title: 'Licence Renouvelée',
+                message: `Nouvelle licence "${type}" pour la boutique ID: ${shopId}.`,
+                type: 'license',
+            }
+        });
+        return res;
     }
     async cancelLicense(shopId) {
         const latest = await this.prisma.license.findFirst({ where: { shopId }, orderBy: { createdAt: 'desc' } });
         if (latest) {
             await this.prisma.license.update({ where: { id: latest.id }, data: { status: 'Annulé' } });
         }
-        return this.prisma.shop.update({ where: { id: shopId }, data: { status: 'inactive' } });
+        const updatedShop = await this.prisma.shop.update({ where: { id: shopId }, data: { status: 'inactive' } });
+        this.notifications.notifySuperAdmins('license_cancelled', { shopId });
+        await this.prisma.notification.create({
+            data: {
+                title: 'Licence Annulée',
+                message: `La licence de la boutique "${updatedShop.name}" a été annulée.`,
+                type: 'license',
+            }
+        });
+        return updatedShop;
     }
     async findMyShop(shopId) {
         return this.findOne(shopId);
@@ -175,6 +213,7 @@ let ShopsService = class ShopsService {
 exports.ShopsService = ShopsService;
 exports.ShopsService = ShopsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        notifications_gateway_1.NotificationsGateway])
 ], ShopsService);
 //# sourceMappingURL=shops.service.js.map

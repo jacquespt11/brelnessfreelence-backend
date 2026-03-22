@@ -6,13 +6,13 @@ export declare class ProductsController {
     private cloudinaryService;
     constructor(productsService: ProductsService, cloudinaryService: CloudinaryService);
     findByShop(shopId: string, search?: string): Promise<{
-        id: string;
-        shopId: string;
-        name: string;
         description: string | null;
+        name: string;
         price: number;
         stock: number;
         images: string[];
+        id: string;
+        shopId: string;
         status: string;
         tags: string[];
         createdAt: Date;
@@ -20,9 +20,9 @@ export declare class ProductsController {
     }[]>;
     findOne(id: string): Promise<{
         shop: {
-            id: string;
-            name: string;
             description: string | null;
+            name: string;
+            id: string;
             status: string;
             createdAt: Date;
             updatedAt: Date;
@@ -31,6 +31,8 @@ export declare class ProductsController {
             businessType: string;
             logo: string | null;
             banner: string | null;
+            heroTitle: string | null;
+            heroImages: string[];
             email: string | null;
             phone: string | null;
             address: string | null;
@@ -40,65 +42,65 @@ export declare class ProductsController {
             tiktok: string | null;
         };
     } & {
-        id: string;
-        shopId: string;
-        name: string;
         description: string | null;
+        name: string;
         price: number;
         stock: number;
         images: string[];
+        id: string;
+        shopId: string;
         status: string;
         tags: string[];
         createdAt: Date;
         updatedAt: Date;
     }>;
     create(req: any, dto: CreateProductDto): Promise<{
-        id: string;
-        shopId: string;
-        name: string;
         description: string | null;
+        name: string;
         price: number;
         stock: number;
         images: string[];
+        id: string;
+        shopId: string;
         status: string;
         tags: string[];
         createdAt: Date;
         updatedAt: Date;
     }>;
     update(id: string, req: any, dto: UpdateProductDto): Promise<{
-        id: string;
-        shopId: string;
-        name: string;
         description: string | null;
+        name: string;
         price: number;
         stock: number;
         images: string[];
+        id: string;
+        shopId: string;
         status: string;
         tags: string[];
         createdAt: Date;
         updatedAt: Date;
     }>;
     remove(id: string, req: any): Promise<{
-        id: string;
-        shopId: string;
-        name: string;
         description: string | null;
+        name: string;
         price: number;
         stock: number;
         images: string[];
+        id: string;
+        shopId: string;
         status: string;
         tags: string[];
         createdAt: Date;
         updatedAt: Date;
     }>;
     uploadImage(id: string, req: any, authReq: any): Promise<{
-        id: string;
-        shopId: string;
-        name: string;
         description: string | null;
+        name: string;
         price: number;
         stock: number;
         images: string[];
+        id: string;
+        shopId: string;
         status: string;
         tags: string[];
         createdAt: Date;
@@ -106,44 +108,44 @@ export declare class ProductsController {
     }>;
     findAll(search?: string): Promise<({
         shop: {
-            id: string;
             name: string;
+            id: string;
             slug: string;
         };
     } & {
-        id: string;
-        shopId: string;
-        name: string;
         description: string | null;
+        name: string;
         price: number;
         stock: number;
         images: string[];
+        id: string;
+        shopId: string;
         status: string;
         tags: string[];
         createdAt: Date;
         updatedAt: Date;
     })[]>;
     adminUpdate(id: string, dto: UpdateProductDto): Promise<{
-        id: string;
-        shopId: string;
-        name: string;
         description: string | null;
+        name: string;
         price: number;
         stock: number;
         images: string[];
+        id: string;
+        shopId: string;
         status: string;
         tags: string[];
         createdAt: Date;
         updatedAt: Date;
     }>;
     adminRemove(id: string): Promise<{
-        id: string;
-        shopId: string;
-        name: string;
         description: string | null;
+        name: string;
         price: number;
         stock: number;
         images: string[];
+        id: string;
+        shopId: string;
         status: string;
         tags: string[];
         createdAt: Date;

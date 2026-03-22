@@ -6,7 +6,7 @@ export class CreateProductDto {
   @ApiProperty({ example: 'Robe élégante noire' })
   @IsString()
   @IsNotEmpty()
-  name: string;
+  name!: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -17,13 +17,13 @@ export class CreateProductDto {
   @Type(() => Number)
   @IsNumber()
   @Min(0)
-  price: number;
+  price!: number;
 
   @ApiProperty({ example: 10 })
   @Type(() => Number)
   @IsNumber()
   @Min(0)
-  stock: number;
+  stock!: number;
 
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()

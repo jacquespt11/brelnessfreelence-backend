@@ -18,6 +18,7 @@ import { ProductsService } from './products.service';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
 import { RolesGuard } from '../auth/roles.guard';
+import { SubscriptionGuard } from '../auth/subscription.guard';
 import { Roles } from '../auth/roles.decorator';
 
 @ApiTags('products')
@@ -42,13 +43,13 @@ export class ProductsController {
   @ApiOperation({ summary: 'Get a single product (public)' })
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.productsService.findOne(id);
+    return this.productsService.findOne(id, true);
   }
 
   // ── Shop Admin ─────────────────────────────────────────────
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a product (SHOP_ADMIN)' })
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @UseGuards(AuthGuard('jwt'), RolesGuard, SubscriptionGuard)
   @Roles('SHOP_ADMIN')
   @Post()
   create(@Request() req: any, @Body() dto: CreateProductDto) {
@@ -57,7 +58,7 @@ export class ProductsController {
 
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update own product (SHOP_ADMIN)' })
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @UseGuards(AuthGuard('jwt'), RolesGuard, SubscriptionGuard)
   @Roles('SHOP_ADMIN')
   @Patch(':id')
   update(
@@ -70,7 +71,7 @@ export class ProductsController {
 
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete own product (SHOP_ADMIN)' })
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @UseGuards(AuthGuard('jwt'), RolesGuard, SubscriptionGuard)
   @Roles('SHOP_ADMIN')
   @Delete(':id')
   remove(@Param('id') id: string, @Request() req: any) {
@@ -81,7 +82,7 @@ export class ProductsController {
   @ApiOperation({ summary: 'Upload product image (SHOP_ADMIN)' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } } })
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @UseGuards(AuthGuard('jwt'), RolesGuard, SubscriptionGuard)
   @Roles('SHOP_ADMIN')
   @Post(':id/image')
   async uploadImage(

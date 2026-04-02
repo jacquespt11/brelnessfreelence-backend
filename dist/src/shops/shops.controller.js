@@ -19,6 +19,7 @@ const swagger_1 = require("@nestjs/swagger");
 const shops_service_1 = require("./shops.service");
 const shop_dto_1 = require("./dto/shop.dto");
 const roles_guard_1 = require("../auth/roles.guard");
+const subscription_guard_1 = require("../auth/subscription.guard");
 const roles_decorator_1 = require("../auth/roles.decorator");
 let ShopsController = class ShopsController {
     shopsService;
@@ -176,7 +177,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Update my shop (SHOP_ADMIN)' }),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard, subscription_guard_1.SubscriptionGuard),
     (0, roles_decorator_1.Roles)('SHOP_ADMIN'),
     (0, common_1.Patch)('me/shop'),
     __param(0, (0, common_1.Request)()),

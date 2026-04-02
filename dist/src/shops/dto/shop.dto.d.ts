@@ -25,4 +25,6 @@ export declare class UpdateShopDto {
     tiktok?: string;
     heroTitle?: string;
     heroImages?: string[];
+    isManualOverride?: boolean;
+    status?: string;
 }

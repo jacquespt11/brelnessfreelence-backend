@@ -21,6 +21,10 @@ const settings_module_1 = require("./settings/settings.module");
 const reviews_module_1 = require("./reviews/reviews.module");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
+const schedule_1 = require("@nestjs/schedule");
+const tickets_module_1 = require("./tickets/tickets.module");
+const tasks_module_1 = require("./tasks/tasks.module");
+const discounts_module_1 = require("./discounts/discounts.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -38,6 +42,10 @@ exports.AppModule = AppModule = __decorate([
             upload_module_1.UploadModule,
             settings_module_1.SettingsModule,
             reviews_module_1.ReviewsModule,
+            schedule_1.ScheduleModule.forRoot(),
+            tickets_module_1.TicketsModule,
+            tasks_module_1.TasksModule,
+            discounts_module_1.DiscountsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

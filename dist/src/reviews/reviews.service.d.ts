@@ -10,11 +10,15 @@ export declare class ReviewsService {
             status: string;
             createdAt: Date;
             updatedAt: Date;
+            category: string | null;
             description: string | null;
             tags: string[];
             price: number;
             stock: number;
             images: string[];
+            isService: boolean;
+            durationMin: number | null;
+            views: number;
         } | null;
     } & {
         id: string;

@@ -47,12 +47,15 @@ model Shop {
   instagram    String?
   twitter      String?
   tiktok       String?
+  isManualOverride Boolean @default(false)
   users        User[]
   products     Product[]
   reservations  Reservation[]
   licenses      License[]
+  supportTickets SupportTicket[]
   notifications Notification[]
   reviews      Review[]
+  discounts    Discount[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
@@ -62,11 +65,23 @@ model License {
   shopId    String
   shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
   type      String   @default("Basic") // "Basic", "Pro", etc.
-  status    String   @default("Actif") // "Actif", "Expiré"
+  status    String   @default("ACTIVE") // "ACTIVE", "WARNING", "GRACE_PERIOD", "EXPIRED"
   startDate DateTime @default(now())
   endDate   DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model SupportTicket {
+  id          String   @id @default(uuid())
+  shopId      String
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  type        String   @default("TECHNICAL") // "RENEWAL", "TECHNICAL", "OTHER"
+  subject     String
+  description String
+  status      String   @default("PENDING") // "PENDING", "IN_PROGRESS", "RESOLVED"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Product {
@@ -80,10 +95,29 @@ model Product {
   images       String[]
   status       String        @default("active")
   tags         String[]
+  category     String?
+  isService    Boolean       @default(false)
+  durationMin  Int?
+  views        Int           @default(0)
+
+  // Rélations
+  variants     ProductVariant[]
   reservations Reservation[]
   reviews      Review[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+}
+
+model ProductVariant {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String
+  price     Float?
+  stock     Int      @default(0)
+  reservations Reservation[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Reservation {
@@ -95,7 +129,19 @@ model Reservation {
   customerName String
   customerPhone String?
   customerEmail String?
+  notes        String?
   quantity     Int
+  
+  // Nouveaux champs pour Variantes & Services
+  variantId    String?
+  variant      ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  bookingDate  DateTime?
+  bookingSlot  String?
+  
+  // Nouveaux champs pour le Prix Total et Code Promo
+  totalAmount  Float?
+  discountCode String?
+
   status       String   @default("PENDING")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -135,4 +181,20 @@ model Review {
   comment      String?
   status       String   @default("published")
   createdAt    DateTime @default(now())
+}
+
+model Discount {
+  id          String    @id @default(uuid())
+  shopId      String
+  shop        Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  code        String    // ex: PROMO20, BEEN10, NOEL2026
+  type        String    @default("PERCENT") // "PERCENT" | "FIXED"
+  value       Float     // 20 pour 20% ou 5000 pour 5000 FCFA
+  minAmount   Float?    // Montant minimum de commande pour activer
+  maxUses     Int?      // Nombre max d'utilisations total (null = illimité)
+  usedCount   Int       @default(0)
+  isActive    Boolean   @default(true)
+  expiresAt   DateTime? // Date d'expiration (null = jamais)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

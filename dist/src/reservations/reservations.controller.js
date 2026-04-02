@@ -19,6 +19,7 @@ const swagger_1 = require("@nestjs/swagger");
 const reservations_service_1 = require("./reservations.service");
 const reservation_dto_1 = require("./dto/reservation.dto");
 const roles_guard_1 = require("../auth/roles.guard");
+const subscription_guard_1 = require("../auth/subscription.guard");
 const roles_decorator_1 = require("../auth/roles.decorator");
 let ReservationsController = class ReservationsController {
     reservationsService;
@@ -79,7 +80,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Update reservation status (SHOP_ADMIN)' }),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard, subscription_guard_1.SubscriptionGuard),
     (0, roles_decorator_1.Roles)('SHOP_ADMIN'),
     (0, common_1.Patch)(':id/status'),
     __param(0, (0, common_1.Param)('id')),
@@ -92,7 +93,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Delete reservation (SHOP_ADMIN)' }),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard, subscription_guard_1.SubscriptionGuard),
     (0, roles_decorator_1.Roles)('SHOP_ADMIN'),
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),

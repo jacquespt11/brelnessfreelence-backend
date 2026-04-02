@@ -13,7 +13,13 @@ export declare class ReservationsController {
         customerName: string;
         customerPhone: string | null;
         customerEmail: string | null;
+        notes: string | null;
         quantity: number;
+        variantId: string | null;
+        bookingDate: Date | null;
+        bookingSlot: string | null;
+        totalAmount: number | null;
+        discountCode: string | null;
     }>;
     findMyShopReservations(req: any): Promise<({
         product: {
@@ -21,6 +27,23 @@ export declare class ReservationsController {
             price: number;
             images: string[];
         };
+        variant: {
+            id: string;
+            name: string;
+            createdAt: Date;
+            updatedAt: Date;
+            productId: string;
+            price: number | null;
+            stock: number;
+        } | {
+            id: string;
+            name: string;
+            createdAt: Date;
+            updatedAt: Date;
+            productId: string;
+            price: number | null;
+            stock: number;
+        } | null;
     } & {
         id: string;
         shopId: string;
@@ -31,7 +54,13 @@ export declare class ReservationsController {
         customerName: string;
         customerPhone: string | null;
         customerEmail: string | null;
+        notes: string | null;
         quantity: number;
+        variantId: string | null;
+        bookingDate: Date | null;
+        bookingSlot: string | null;
+        totalAmount: number | null;
+        discountCode: string | null;
     })[]>;
     findMyShopCustomers(req: any): Promise<any[]>;
     updateStatus(id: string, req: any, dto: UpdateReservationStatusDto): Promise<{
@@ -44,7 +73,13 @@ export declare class ReservationsController {
         customerName: string;
         customerPhone: string | null;
         customerEmail: string | null;
+        notes: string | null;
         quantity: number;
+        variantId: string | null;
+        bookingDate: Date | null;
+        bookingSlot: string | null;
+        totalAmount: number | null;
+        discountCode: string | null;
     }>;
     remove(id: string, req: any): Promise<{
         id: string;
@@ -56,7 +91,13 @@ export declare class ReservationsController {
         customerName: string;
         customerPhone: string | null;
         customerEmail: string | null;
+        notes: string | null;
         quantity: number;
+        variantId: string | null;
+        bookingDate: Date | null;
+        bookingSlot: string | null;
+        totalAmount: number | null;
+        discountCode: string | null;
     }>;
     findAllGlobal(): Promise<({
         shop: {
@@ -76,6 +117,12 @@ export declare class ReservationsController {
         customerName: string;
         customerPhone: string | null;
         customerEmail: string | null;
+        notes: string | null;
         quantity: number;
+        variantId: string | null;
+        bookingDate: Date | null;
+        bookingSlot: string | null;
+        totalAmount: number | null;
+        discountCode: string | null;
     })[]>;
 }

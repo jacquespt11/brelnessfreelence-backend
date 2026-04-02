@@ -61,5 +61,7 @@ export class UpdateShopDto {
   @ApiPropertyOptional() @IsOptional() @IsString() tiktok?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() heroTitle?: string;
   @ApiPropertyOptional() @IsOptional() @IsString({ each: true }) heroImages?: string[];
-}
 
+  @ApiPropertyOptional() @IsOptional() isManualOverride?: boolean;
+  @ApiPropertyOptional() @IsOptional() @IsString() status?: string;
+}

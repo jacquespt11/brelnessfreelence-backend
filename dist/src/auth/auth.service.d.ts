@@ -29,7 +29,6 @@ export declare class AuthService {
     private issueToken;
     findAll(): Promise<({
         shop: {
-            description: string | null;
             id: string;
             email: string | null;
             name: string;
@@ -44,11 +43,13 @@ export declare class AuthService {
             banner: string | null;
             heroTitle: string | null;
             heroImages: string[];
+            description: string | null;
             address: string | null;
             facebook: string | null;
             instagram: string | null;
             twitter: string | null;
             tiktok: string | null;
+            isManualOverride: boolean;
         } | null;
     } & {
         id: string;

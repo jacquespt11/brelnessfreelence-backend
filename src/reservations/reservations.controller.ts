@@ -14,6 +14,7 @@ import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { ReservationsService } from './reservations.service';
 import { CreateReservationDto, UpdateReservationStatusDto } from './dto/reservation.dto';
 import { RolesGuard } from '../auth/roles.guard';
+import { SubscriptionGuard } from '../auth/subscription.guard';
 import { Roles } from '../auth/roles.decorator';
 
 @ApiTags('reservations')
@@ -49,7 +50,7 @@ export class ReservationsController {
 
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update reservation status (SHOP_ADMIN)' })
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @UseGuards(AuthGuard('jwt'), RolesGuard, SubscriptionGuard)
   @Roles('SHOP_ADMIN')
   @Patch(':id/status')
   updateStatus(
@@ -62,7 +63,7 @@ export class ReservationsController {
 
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete reservation (SHOP_ADMIN)' })
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @UseGuards(AuthGuard('jwt'), RolesGuard, SubscriptionGuard)
   @Roles('SHOP_ADMIN')
   @Delete(':id')
   remove(@Param('id') id: string, @Request() req: any) {

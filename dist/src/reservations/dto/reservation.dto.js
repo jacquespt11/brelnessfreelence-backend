@@ -25,7 +25,12 @@ class CreateReservationDto {
     customerName;
     customerPhone;
     customerEmail;
+    notes;
     quantity;
+    variantId;
+    bookingDate;
+    bookingSlot;
+    discountCode;
 }
 exports.CreateReservationDto = CreateReservationDto;
 __decorate([
@@ -53,12 +58,42 @@ __decorate([
     __metadata("design:type", String)
 ], CreateReservationDto.prototype, "customerEmail", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Couleur bleue souhaitée' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateReservationDto.prototype, "notes", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({ example: 2 }),
     (0, class_transformer_1.Type)(() => Number),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.Min)(1),
     __metadata("design:type", Number)
 ], CreateReservationDto.prototype, "quantity", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'variant-uuid' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateReservationDto.prototype, "variantId", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: '2026-04-01T10:00:00Z' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Type)(() => Date),
+    __metadata("design:type", Date)
+], CreateReservationDto.prototype, "bookingDate", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: '14:00' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateReservationDto.prototype, "bookingSlot", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'PROMO20' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateReservationDto.prototype, "discountCode", void 0);
 class UpdateReservationStatusDto {
     status;
 }

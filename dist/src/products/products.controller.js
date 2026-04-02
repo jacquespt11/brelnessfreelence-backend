@@ -20,6 +20,7 @@ const products_service_1 = require("./products.service");
 const cloudinary_service_1 = require("../cloudinary/cloudinary.service");
 const product_dto_1 = require("./dto/product.dto");
 const roles_guard_1 = require("../auth/roles.guard");
+const subscription_guard_1 = require("../auth/subscription.guard");
 const roles_decorator_1 = require("../auth/roles.decorator");
 let ProductsController = class ProductsController {
     productsService;
@@ -32,7 +33,7 @@ let ProductsController = class ProductsController {
         return this.productsService.findByShop(shopId, search);
     }
     findOne(id) {
-        return this.productsService.findOne(id);
+        return this.productsService.findOne(id, true);
     }
     create(req, dto) {
         return this.productsService.create(req.user.shopId, dto);
@@ -90,7 +91,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Create a product (SHOP_ADMIN)' }),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard, subscription_guard_1.SubscriptionGuard),
     (0, roles_decorator_1.Roles)('SHOP_ADMIN'),
     (0, common_1.Post)(),
     __param(0, (0, common_1.Request)()),
@@ -102,7 +103,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Update own product (SHOP_ADMIN)' }),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard, subscription_guard_1.SubscriptionGuard),
     (0, roles_decorator_1.Roles)('SHOP_ADMIN'),
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id')),
@@ -115,7 +116,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Delete own product (SHOP_ADMIN)' }),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard, subscription_guard_1.SubscriptionGuard),
     (0, roles_decorator_1.Roles)('SHOP_ADMIN'),
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),
@@ -129,7 +130,7 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Upload product image (SHOP_ADMIN)' }),
     (0, swagger_1.ApiConsumes)('multipart/form-data'),
     (0, swagger_1.ApiBody)({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } } }),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard, subscription_guard_1.SubscriptionGuard),
     (0, roles_decorator_1.Roles)('SHOP_ADMIN'),
     (0, common_1.Post)(':id/image'),
     __param(0, (0, common_1.Param)('id')),

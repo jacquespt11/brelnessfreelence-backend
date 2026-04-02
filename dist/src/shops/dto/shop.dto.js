@@ -88,6 +88,8 @@ class UpdateShopDto {
     tiktok;
     heroTitle;
     heroImages;
+    isManualOverride;
+    status;
 }
 exports.UpdateShopDto = UpdateShopDto;
 __decorate([
@@ -186,4 +188,15 @@ __decorate([
     (0, class_validator_1.IsString)({ each: true }),
     __metadata("design:type", Array)
 ], UpdateShopDto.prototype, "heroImages", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], UpdateShopDto.prototype, "isManualOverride", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateShopDto.prototype, "status", void 0);
 //# sourceMappingURL=shop.dto.js.map

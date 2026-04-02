@@ -25,28 +25,56 @@ let ProductsService = class ProductsService {
                     ? { name: { contains: search, mode: 'insensitive' } }
                     : {}),
             },
+            include: { variants: true },
             orderBy: { createdAt: 'desc' },
         });
     }
-    async findOne(id) {
+    async findOne(id, incrementView = false) {
+        if (incrementView) {
+            await this.prisma.product.update({
+                where: { id },
+                data: { views: { increment: 1 } },
+            }).catch((e) => console.error("Error incrementing view:", e));
+        }
         const product = await this.prisma.product.findUnique({
             where: { id },
-            include: { shop: true },
+            include: { shop: true, variants: true },
         });
         if (!product)
             throw new common_1.NotFoundException('Produit introuvable');
         return product;
     }
     async create(shopId, dto) {
+        const { variants, ...productData } = dto;
         return this.prisma.product.create({
-            data: { ...dto, shopId },
+            data: {
+                ...productData,
+                shopId,
+                variants: variants && variants.length > 0
+                    ? { create: variants.map(v => ({ name: v.name, price: v.price, stock: v.stock })) }
+                    : undefined,
+            },
+            include: { variants: true },
         });
     }
     async update(id, shopId, dto) {
         const product = await this.findOne(id);
         if (product.shopId !== shopId)
             throw new common_1.ForbiddenException('Accès refusé');
-        return this.prisma.product.update({ where: { id }, data: dto });
+        const { variants, ...productData } = dto;
+        return this.prisma.product.update({
+            where: { id },
+            data: {
+                ...productData,
+                variants: variants
+                    ? {
+                        deleteMany: {},
+                        create: variants.map(v => ({ name: v.name, price: v.price, stock: v.stock })),
+                    }
+                    : undefined,
+            },
+            include: { variants: true },
+        });
     }
     async remove(id, shopId) {
         const product = await this.findOne(id);
@@ -59,13 +87,28 @@ let ProductsService = class ProductsService {
             where: search
                 ? { name: { contains: search, mode: 'insensitive' } }
                 : undefined,
-            include: { shop: { select: { id: true, name: true, slug: true } } },
+            include: {
+                shop: { select: { id: true, name: true, slug: true } },
+                variants: true,
+            },
             orderBy: { createdAt: 'desc' },
         });
     }
     async adminUpdate(id, dto) {
         await this.findOne(id);
-        return this.prisma.product.update({ where: { id }, data: dto });
+        const { variants, ...productData } = dto;
+        return this.prisma.product.update({
+            where: { id },
+            data: {
+                ...productData,
+                variants: variants
+                    ? {
+                        deleteMany: {},
+                        create: variants.map(v => ({ name: v.name, price: v.price, stock: v.stock })),
+                    }
+                    : undefined,
+            },
+        });
     }
     async adminRemove(id) {
         await this.findOne(id);

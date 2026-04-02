@@ -16,10 +16,6 @@ export declare class ShopsService {
             startDate: Date;
             endDate: Date;
         };
-        _count: {
-            products: number;
-            reservations: number;
-        };
         users: {
             id: string;
             email: string;
@@ -36,7 +32,10 @@ export declare class ShopsService {
             startDate: Date;
             endDate: Date;
         }[];
-        description: string | null;
+        _count: {
+            products: number;
+            reservations: number;
+        };
         id: string;
         email: string | null;
         name: string;
@@ -51,11 +50,13 @@ export declare class ShopsService {
         banner: string | null;
         heroTitle: string | null;
         heroImages: string[];
+        description: string | null;
         address: string | null;
         facebook: string | null;
         instagram: string | null;
         twitter: string | null;
         tiktok: string | null;
+        isManualOverride: boolean;
     }[]>;
     findOne(id: string): Promise<{
         license: {
@@ -68,10 +69,6 @@ export declare class ShopsService {
             startDate: Date;
             endDate: Date;
         };
-        _count: {
-            products: number;
-            reservations: number;
-        };
         users: {
             id: string;
             email: string;
@@ -88,7 +85,10 @@ export declare class ShopsService {
             startDate: Date;
             endDate: Date;
         }[];
-        description: string | null;
+        _count: {
+            products: number;
+            reservations: number;
+        };
         id: string;
         email: string | null;
         name: string;
@@ -103,14 +103,15 @@ export declare class ShopsService {
         banner: string | null;
         heroTitle: string | null;
         heroImages: string[];
+        description: string | null;
         address: string | null;
         facebook: string | null;
         instagram: string | null;
         twitter: string | null;
         tiktok: string | null;
+        isManualOverride: boolean;
     }>;
     findBySlug(slug: string): Promise<{
-        description: string | null;
         id: string;
         email: string | null;
         name: string;
@@ -125,11 +126,13 @@ export declare class ShopsService {
         banner: string | null;
         heroTitle: string | null;
         heroImages: string[];
+        description: string | null;
         address: string | null;
         facebook: string | null;
         instagram: string | null;
         twitter: string | null;
         tiktok: string | null;
+        isManualOverride: boolean;
     }>;
     create(dto: CreateShopDto): Promise<{
         license: {
@@ -142,10 +145,6 @@ export declare class ShopsService {
             startDate: Date;
             endDate: Date;
         };
-        _count: {
-            products: number;
-            reservations: number;
-        };
         users: {
             id: string;
             email: string;
@@ -162,7 +161,10 @@ export declare class ShopsService {
             startDate: Date;
             endDate: Date;
         }[];
-        description: string | null;
+        _count: {
+            products: number;
+            reservations: number;
+        };
         id: string;
         email: string | null;
         name: string;
@@ -177,14 +179,15 @@ export declare class ShopsService {
         banner: string | null;
         heroTitle: string | null;
         heroImages: string[];
+        description: string | null;
         address: string | null;
         facebook: string | null;
         instagram: string | null;
         twitter: string | null;
         tiktok: string | null;
+        isManualOverride: boolean;
     }>;
     update(id: string, dto: UpdateShopDto): Promise<{
-        description: string | null;
         id: string;
         email: string | null;
         name: string;
@@ -199,14 +202,15 @@ export declare class ShopsService {
         banner: string | null;
         heroTitle: string | null;
         heroImages: string[];
+        description: string | null;
         address: string | null;
         facebook: string | null;
         instagram: string | null;
         twitter: string | null;
         tiktok: string | null;
+        isManualOverride: boolean;
     }>;
     toggleStatus(id: string): Promise<{
-        description: string | null;
         id: string;
         email: string | null;
         name: string;
@@ -221,14 +225,15 @@ export declare class ShopsService {
         banner: string | null;
         heroTitle: string | null;
         heroImages: string[];
+        description: string | null;
         address: string | null;
         facebook: string | null;
         instagram: string | null;
         twitter: string | null;
         tiktok: string | null;
+        isManualOverride: boolean;
     }>;
     remove(id: string): Promise<{
-        description: string | null;
         id: string;
         email: string | null;
         name: string;
@@ -243,11 +248,13 @@ export declare class ShopsService {
         banner: string | null;
         heroTitle: string | null;
         heroImages: string[];
+        description: string | null;
         address: string | null;
         facebook: string | null;
         instagram: string | null;
         twitter: string | null;
         tiktok: string | null;
+        isManualOverride: boolean;
     }>;
     renewLicense(shopId: string, type: string, days: number): Promise<{
         id: string;
@@ -260,7 +267,6 @@ export declare class ShopsService {
         endDate: Date;
     }>;
     cancelLicense(shopId: string): Promise<{
-        description: string | null;
         id: string;
         email: string | null;
         name: string;
@@ -275,11 +281,13 @@ export declare class ShopsService {
         banner: string | null;
         heroTitle: string | null;
         heroImages: string[];
+        description: string | null;
         address: string | null;
         facebook: string | null;
         instagram: string | null;
         twitter: string | null;
         tiktok: string | null;
+        isManualOverride: boolean;
     }>;
     findMyShop(shopId: string): Promise<{
         license: {
@@ -291,10 +299,6 @@ export declare class ShopsService {
             type: string;
             startDate: Date;
             endDate: Date;
-        };
-        _count: {
-            products: number;
-            reservations: number;
         };
         users: {
             id: string;
@@ -312,7 +316,10 @@ export declare class ShopsService {
             startDate: Date;
             endDate: Date;
         }[];
-        description: string | null;
+        _count: {
+            products: number;
+            reservations: number;
+        };
         id: string;
         email: string | null;
         name: string;
@@ -327,14 +334,15 @@ export declare class ShopsService {
         banner: string | null;
         heroTitle: string | null;
         heroImages: string[];
+        description: string | null;
         address: string | null;
         facebook: string | null;
         instagram: string | null;
         twitter: string | null;
         tiktok: string | null;
+        isManualOverride: boolean;
     }>;
     updateMyShop(shopId: string, dto: UpdateShopDto): Promise<{
-        description: string | null;
         id: string;
         email: string | null;
         name: string;
@@ -349,24 +357,35 @@ export declare class ShopsService {
         banner: string | null;
         heroTitle: string | null;
         heroImages: string[];
+        description: string | null;
         address: string | null;
         facebook: string | null;
         instagram: string | null;
         twitter: string | null;
         tiktok: string | null;
+        isManualOverride: boolean;
     }>;
     getAnalytics(shopId: string, period?: string): Promise<{
         period: string;
         totalReservations: number;
         revenue: number;
+        totalViews: any;
+        completionRate: number;
+        avgRating: string;
         trends: {
             date: string;
             count: number;
+            revenue: number;
+        }[];
+        salesByCategory: {
+            name: string;
+            value: number;
+            color: string;
         }[];
         topProducts: {
-            id: string;
-            name: string;
-            reservationCount: number;
+            id: any;
+            name: any;
+            reservationCount: any;
         }[];
     }>;
 }

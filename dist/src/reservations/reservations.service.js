@@ -14,37 +14,99 @@ const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const reservation_dto_1 = require("./dto/reservation.dto");
 const notifications_gateway_1 = require("../notifications/notifications.gateway");
+const discounts_service_1 = require("../discounts/discounts.service");
 let ReservationsService = class ReservationsService {
     prisma;
     notifications;
-    constructor(prisma, notifications) {
+    discountsService;
+    constructor(prisma, notifications, discountsService) {
         this.prisma = prisma;
         this.notifications = notifications;
+        this.discountsService = discountsService;
     }
     async create(shopId, dto) {
-        const product = await this.prisma.product.findUnique({ where: { id: dto.productId } });
+        const product = await this.prisma.product.findUnique({
+            where: { id: dto.productId },
+            include: { variants: true }
+        });
         if (!product || product.shopId !== shopId) {
             throw new common_1.NotFoundException('Produit introuvable dans cette boutique');
         }
-        if (product.stock < dto.quantity) {
-            throw new common_1.BadRequestException('Stock insuffisant');
+        let variant = null;
+        if (dto.variantId) {
+            variant = product.variants?.find(v => v.id === dto.variantId);
+            if (!variant)
+                throw new common_1.NotFoundException('Variante introuvable');
+        }
+        const isService = product.isService;
+        if (!isService) {
+            if (variant) {
+                if (variant.stock < dto.quantity)
+                    throw new common_1.BadRequestException('Stock insuffisant pour cette variante');
+            }
+            else {
+                if (product.stock < dto.quantity)
+                    throw new common_1.BadRequestException('Stock insuffisant');
+            }
+        }
+        else {
+            if (!dto.bookingDate || !dto.bookingSlot) {
+                throw new common_1.BadRequestException('La date et le créneau sont obligatoires pour un service');
+            }
+        }
+        const basePrice = (variant ? variant.price || product.price : product.price) || 0;
+        let totalAmount = basePrice * dto.quantity;
+        let appliedDiscountId = null;
+        if (dto.discountCode) {
+            const discount = await this.discountsService.validateCode(shopId, dto.discountCode, totalAmount);
+            if (discount.type === 'PERCENT') {
+                totalAmount = totalAmount - (totalAmount * (discount.value / 100));
+            }
+            else {
+                totalAmount = totalAmount - discount.value;
+            }
+            if (totalAmount < 0)
+                totalAmount = 0;
+            appliedDiscountId = discount.id;
         }
         return this.prisma.$transaction(async (tx) => {
             const reservation = await tx.reservation.create({
                 data: {
                     shopId,
                     productId: dto.productId,
+                    variantId: dto.variantId,
+                    bookingDate: dto.bookingDate,
+                    bookingSlot: dto.bookingSlot,
                     customerName: dto.customerName,
                     customerPhone: dto.customerPhone,
                     customerEmail: dto.customerEmail,
+                    notes: dto.notes,
                     quantity: dto.quantity,
+                    totalAmount: totalAmount,
+                    discountCode: dto.discountCode,
                     status: reservation_dto_1.ReservationStatus.PENDING,
                 },
             });
-            await tx.product.update({
-                where: { id: dto.productId },
-                data: { stock: { decrement: dto.quantity } },
-            });
+            if (!isService) {
+                if (variant) {
+                    await tx.productVariant.update({
+                        where: { id: dto.variantId },
+                        data: { stock: { decrement: dto.quantity } },
+                    });
+                }
+                else {
+                    await tx.product.update({
+                        where: { id: dto.productId },
+                        data: { stock: { decrement: dto.quantity } },
+                    });
+                }
+            }
+            if (appliedDiscountId) {
+                await tx.discount.update({
+                    where: { id: appliedDiscountId },
+                    data: { usedCount: { increment: 1 } }
+                });
+            }
             this.notifications.notifyShopAdmin(shopId, 'new_reservation', reservation);
             await tx.notification.create({
                 data: {
@@ -61,7 +123,8 @@ let ReservationsService = class ReservationsService {
         return this.prisma.reservation.findMany({
             where: { shopId },
             include: {
-                product: { select: { name: true, price: true, images: true } }
+                product: { select: { name: true, price: true, images: true } },
+                variant: true
             },
             orderBy: { createdAt: 'desc' },
         });
@@ -110,10 +173,21 @@ let ReservationsService = class ReservationsService {
             throw new common_1.ForbiddenException('Accès refusé');
         return this.prisma.$transaction(async (tx) => {
             if (dto.status === reservation_dto_1.ReservationStatus.CANCELLED && reservation.status !== reservation_dto_1.ReservationStatus.CANCELLED) {
-                await tx.product.update({
-                    where: { id: reservation.productId },
-                    data: { stock: { increment: reservation.quantity } },
-                });
+                const prod = await tx.product.findUnique({ where: { id: reservation.productId } });
+                if (!prod?.isService) {
+                    if (reservation.variantId) {
+                        await tx.productVariant.update({
+                            where: { id: reservation.variantId },
+                            data: { stock: { increment: reservation.quantity } },
+                        });
+                    }
+                    else {
+                        await tx.product.update({
+                            where: { id: reservation.productId },
+                            data: { stock: { increment: reservation.quantity } },
+                        });
+                    }
+                }
             }
             const updated = await tx.reservation.update({
                 where: { id },
@@ -145,6 +219,7 @@ exports.ReservationsService = ReservationsService;
 exports.ReservationsService = ReservationsService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        notifications_gateway_1.NotificationsGateway])
+        notifications_gateway_1.NotificationsGateway,
+        discounts_service_1.DiscountsService])
 ], ReservationsService);
 //# sourceMappingURL=reservations.service.js.map

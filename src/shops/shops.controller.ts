@@ -15,6 +15,7 @@ import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger'
 import { ShopsService } from './shops.service';
 import { CreateShopDto, UpdateShopDto } from './dto/shop.dto';
 import { RolesGuard } from '../auth/roles.guard';
+import { SubscriptionGuard } from '../auth/subscription.guard';
 import { Roles } from '../auth/roles.decorator';
 
 @ApiTags('shops')
@@ -115,7 +116,7 @@ export class ShopsController {
 
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update my shop (SHOP_ADMIN)' })
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @UseGuards(AuthGuard('jwt'), RolesGuard, SubscriptionGuard)
   @Roles('SHOP_ADMIN')
   @Patch('me/shop')
   updateMyShop(@Request() req: any, @Body() dto: UpdateShopDto) {

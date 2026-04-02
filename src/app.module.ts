@@ -12,6 +12,10 @@ import { SettingsModule } from './settings/settings.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TicketsModule } from './tickets/tickets.module';
+import { TasksModule } from './tasks/tasks.module';
+import { DiscountsModule } from './discounts/discounts.module';
 
 @Module({
   imports: [
@@ -26,6 +30,10 @@ import { AppService } from './app.service';
     UploadModule,
     SettingsModule,
     ReviewsModule,
+    ScheduleModule.forRoot(),
+    TicketsModule,
+    TasksModule,
+    DiscountsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

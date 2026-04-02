@@ -6,12 +6,15 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
 
+// Note: 'variants' and 'isService'/'durationMin' are new fields added via prisma db push.
+// TypeScript types will refresh after the next successful `prisma generate` (requires stopping the server).
+// In the meantime, `as any` casts allow the runtime to work correctly.
+
 @Injectable()
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
   // ── Public / Shop Admin ────────────────────────────────────
-  // List products of a specific shop (public catalog)
   async findByShop(shopId: string, search?: string) {
     return this.prisma.product.findMany({
       where: {
@@ -20,15 +23,21 @@ export class ProductsService {
           ? { name: { contains: search, mode: 'insensitive' } }
           : {}),
       },
+      include: { variants: true },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  // Get a single product (public) – includes shop for the product detail page
-  async findOne(id: string) {
+  async findOne(id: string, incrementView = false) {
+    if (incrementView) {
+      await this.prisma.product.update({
+        where: { id },
+        data: { views: { increment: 1 } },
+      }).catch((e: any) => console.error("Error incrementing view:", e));
+    }
     const product = await this.prisma.product.findUnique({
       where: { id },
-      include: { shop: true },
+      include: { shop: true, variants: true },
     });
     if (!product) throw new NotFoundException('Produit introuvable');
     return product;
@@ -36,8 +45,16 @@ export class ProductsService {
 
   // ── Shop Admin : own shop products only ────────────────────
   async create(shopId: string, dto: CreateProductDto) {
+    const { variants, ...productData } = dto;
     return this.prisma.product.create({
-      data: { ...dto, shopId },
+      data: {
+        ...productData,
+        shopId,
+        variants: variants && variants.length > 0
+          ? { create: variants.map(v => ({ name: v.name, price: v.price, stock: v.stock })) }
+          : undefined,
+      },
+      include: { variants: true },
     });
   }
 
@@ -45,7 +62,22 @@ export class ProductsService {
     const product = await this.findOne(id);
     if (product.shopId !== shopId)
       throw new ForbiddenException('Accès refusé');
-    return this.prisma.product.update({ where: { id }, data: dto });
+
+    const { variants, ...productData } = dto;
+
+    return this.prisma.product.update({
+      where: { id },
+      data: {
+        ...productData,
+        variants: variants
+          ? {
+              deleteMany: {},
+              create: variants.map(v => ({ name: v.name, price: v.price, stock: v.stock })),
+            }
+          : undefined,
+      },
+      include: { variants: true },
+    });
   }
 
   async remove(id: string, shopId: string) {
@@ -61,14 +93,29 @@ export class ProductsService {
       where: search
         ? { name: { contains: search, mode: 'insensitive' } }
         : undefined,
-      include: { shop: { select: { id: true, name: true, slug: true } } },
+      include: {
+        shop: { select: { id: true, name: true, slug: true } },
+        variants: true,
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
 
   async adminUpdate(id: string, dto: UpdateProductDto) {
     await this.findOne(id);
-    return this.prisma.product.update({ where: { id }, data: dto });
+    const { variants, ...productData } = dto;
+    return this.prisma.product.update({
+      where: { id },
+      data: {
+        ...productData,
+        variants: variants
+          ? {
+              deleteMany: {},
+              create: variants.map(v => ({ name: v.name, price: v.price, stock: v.stock })),
+            }
+          : undefined,
+      },
+    });
   }
 
   async adminRemove(id: string) {

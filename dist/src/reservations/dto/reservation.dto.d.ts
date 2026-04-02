@@ -9,7 +9,12 @@ export declare class CreateReservationDto {
     customerName: string;
     customerPhone: string;
     customerEmail?: string;
+    notes?: string;
     quantity: number;
+    variantId?: string;
+    bookingDate?: Date;
+    bookingSlot?: string;
+    discountCode?: string;
 }
 export declare class UpdateReservationStatusDto {
     status: ReservationStatus;

@@ -37,7 +37,7 @@ export class AuthService {
     return this.issueToken(user);
   }
 
-  private issueToken(user: any) {
+  issueToken(user: any) {
     const payload = {
       sub: user.id,
       email: user.email,

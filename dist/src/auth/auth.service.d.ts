@@ -26,7 +26,16 @@ export declare class AuthService {
             shopId: any;
         };
     }>;
-    private issueToken;
+    issueToken(user: any): {
+        access_token: string;
+        user: {
+            id: any;
+            email: any;
+            name: any;
+            role: any;
+            shopId: any;
+        };
+    };
     findAll(): Promise<({
         shop: {
             id: string;

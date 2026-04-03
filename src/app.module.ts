@@ -16,6 +16,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TicketsModule } from './tickets/tickets.module';
 import { TasksModule } from './tasks/tasks.module';
 import { DiscountsModule } from './discounts/discounts.module';
+import { ShopRequestsModule } from './shop-requests/shop-requests.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { DiscountsModule } from './discounts/discounts.module';
     TicketsModule,
     TasksModule,
     DiscountsModule,
+    ShopRequestsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

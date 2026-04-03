@@ -31,6 +31,17 @@ export declare class AuthController {
             shopId: any;
         };
     }>;
+    googleAuth(req: any): Promise<void>;
+    googleAuthRedirect(req: any): Promise<{
+        access_token: string;
+        user: {
+            id: any;
+            email: any;
+            name: any;
+            role: any;
+            shopId: any;
+        };
+    }>;
     findAll(): Promise<({
         shop: {
             id: string;

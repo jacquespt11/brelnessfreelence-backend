@@ -45,6 +45,20 @@ export class AuthController {
     return this.authService.register(body.email, body.password, body.name);
   }
 
+  @ApiOperation({ summary: 'Redirection vers la mire Google' })
+  @UseGuards(AuthGuard('google'))
+  @Get('google')
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  async googleAuth(@Request() req: any) {}
+
+  @ApiOperation({ summary: 'Callback Google post-auth' })
+  @UseGuards(AuthGuard('google'))
+  @Get('google/callback')
+  async googleAuthRedirect(@Request() req: any) {
+    // Si la stratégie Google valide l'utilisateur, on génère un token JWT
+    return this.authService.issueToken(req.user);
+  }
+
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Liste tous les utilisateurs (SUPER_ADMIN)' })
   @UseGuards(AuthGuard('jwt'), RolesGuard)

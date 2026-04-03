@@ -62,6 +62,10 @@ let AuthController = class AuthController {
     register(body) {
         return this.authService.register(body.email, body.password, body.name);
     }
+    async googleAuth(req) { }
+    async googleAuthRedirect(req) {
+        return this.authService.issueToken(req.user);
+    }
     findAll() {
         return this.authService.findAll();
     }
@@ -98,6 +102,24 @@ __decorate([
     __metadata("design:paramtypes", [RegisterDto]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "register", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Redirection vers la mire Google' }),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('google')),
+    (0, common_1.Get)('google'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "googleAuth", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Callback Google post-auth' }),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('google')),
+    (0, common_1.Get)('google/callback'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "googleAuthRedirect", null);
 __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Liste tous les utilisateurs (SUPER_ADMIN)' }),

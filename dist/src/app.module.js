@@ -25,6 +25,7 @@ const schedule_1 = require("@nestjs/schedule");
 const tickets_module_1 = require("./tickets/tickets.module");
 const tasks_module_1 = require("./tasks/tasks.module");
 const discounts_module_1 = require("./discounts/discounts.module");
+const shop_requests_module_1 = require("./shop-requests/shop-requests.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -46,6 +47,7 @@ exports.AppModule = AppModule = __decorate([
             tickets_module_1.TicketsModule,
             tasks_module_1.TasksModule,
             discounts_module_1.DiscountsModule,
+            shop_requests_module_1.ShopRequestsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

@@ -18,6 +18,11 @@ export class SubscriptionGuard implements CanActivate {
     // Les tickets doivent toujours pouvoir être créés
     if (request.url.includes('/tickets')) return true;
 
+    // Vérification critique : si le shopId est null, on refuse l'accès proprement
+    if (!user.shopId) {
+      throw new ForbiddenException('Aucune boutique associée à ce compte.');
+    }
+
     // On vérifie le shop
     const shop = await this.prisma.shop.findUnique({
       where: { id: user.shopId },

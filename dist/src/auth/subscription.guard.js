@@ -26,6 +26,9 @@ let SubscriptionGuard = class SubscriptionGuard {
             return true;
         if (request.url.includes('/tickets'))
             return true;
+        if (!user.shopId) {
+            throw new common_1.ForbiddenException('Aucune boutique associée à ce compte.');
+        }
         const shop = await this.prisma.shop.findUnique({
             where: { id: user.shopId },
             include: {

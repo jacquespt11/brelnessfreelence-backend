@@ -38,10 +38,16 @@ export class DiscountsService {
 
   // ── Shop Admin : own shop discounts only ────────────────────
   async findByShop(shopId: string) {
-    return (this.prisma as any).discount.findMany({
-      where: { shopId },
-      orderBy: { createdAt: 'desc' },
-    });
+    if (!shopId) return [];
+    try {
+      return await (this.prisma as any).discount.findMany({
+        where: { shopId },
+        orderBy: { createdAt: 'desc' },
+      });
+    } catch (err: any) {
+      console.error('[DiscountsService.findByShop] Error:', err?.message, 'shopId:', shopId);
+      return [];
+    }
   }
 
   async create(shopId: string, dto: CreateDiscountDto) {

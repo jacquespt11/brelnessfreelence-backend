@@ -33,7 +33,7 @@ export class DiscountsController {
   }
 
   // ── Shop Admin ──────────────────────────────────────────────
-  @UseGuards(AuthGuard('jwt'), RolesGuard, SubscriptionGuard)
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('SHOP_ADMIN')
   @Get()
   findByShop(@Request() req: any) {

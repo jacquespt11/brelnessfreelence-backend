@@ -36,10 +36,18 @@ let DiscountsService = class DiscountsService {
         return discount;
     }
     async findByShop(shopId) {
-        return this.prisma.discount.findMany({
-            where: { shopId },
-            orderBy: { createdAt: 'desc' },
-        });
+        if (!shopId)
+            return [];
+        try {
+            return await this.prisma.discount.findMany({
+                where: { shopId },
+                orderBy: { createdAt: 'desc' },
+            });
+        }
+        catch (err) {
+            console.error('[DiscountsService.findByShop] Error:', err?.message, 'shopId:', shopId);
+            return [];
+        }
     }
     async create(shopId, dto) {
         const existing = await this.prisma.discount.findFirst({

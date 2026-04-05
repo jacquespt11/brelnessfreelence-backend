@@ -6,11 +6,17 @@ export class ReviewsService {
   constructor(private prisma: PrismaService) {}
 
   async findAllByShop(shopId: string) {
-    return this.prisma.review.findMany({
-      where: { shopId },
-      include: { product: true },
-      orderBy: { createdAt: 'desc' }
-    });
+    if (!shopId) return [];
+    try {
+      return await this.prisma.review.findMany({
+        where: { shopId },
+        include: { product: true },
+        orderBy: { createdAt: 'desc' }
+      });
+    } catch (err) {
+      console.error('[ReviewsService.findAllByShop] Error:', (err as any)?.message, 'shopId:', shopId);
+      return [];
+    }
   }
 
   async toggleStatus(id: string) {

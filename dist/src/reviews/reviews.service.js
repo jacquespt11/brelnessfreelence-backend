@@ -18,11 +18,19 @@ let ReviewsService = class ReviewsService {
         this.prisma = prisma;
     }
     async findAllByShop(shopId) {
-        return this.prisma.review.findMany({
-            where: { shopId },
-            include: { product: true },
-            orderBy: { createdAt: 'desc' }
-        });
+        if (!shopId)
+            return [];
+        try {
+            return await this.prisma.review.findMany({
+                where: { shopId },
+                include: { product: true },
+                orderBy: { createdAt: 'desc' }
+            });
+        }
+        catch (err) {
+            console.error('[ReviewsService.findAllByShop] Error:', err?.message, 'shopId:', shopId);
+            return [];
+        }
     }
     async toggleStatus(id) {
         const review = await this.prisma.review.findUnique({ where: { id } });

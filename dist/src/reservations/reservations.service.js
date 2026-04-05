@@ -120,20 +120,37 @@ let ReservationsService = class ReservationsService {
         });
     }
     async findByShop(shopId) {
-        return this.prisma.reservation.findMany({
-            where: { shopId },
-            include: {
-                product: { select: { name: true, price: true, images: true } },
-                variant: true
-            },
-            orderBy: { createdAt: 'desc' },
-        });
+        if (!shopId)
+            return [];
+        try {
+            return await this.prisma.reservation.findMany({
+                where: { shopId },
+                include: {
+                    product: { select: { name: true, price: true, images: true } },
+                    variant: true
+                },
+                orderBy: { createdAt: 'desc' },
+            });
+        }
+        catch (err) {
+            console.error('[ReservationsService.findByShop] Error:', err?.message, 'shopId:', shopId);
+            return [];
+        }
     }
     async getShopCustomers(shopId) {
-        const reservations = await this.prisma.reservation.findMany({
-            where: { shopId },
-            include: { product: true },
-        });
+        if (!shopId)
+            return [];
+        let reservations = [];
+        try {
+            reservations = await this.prisma.reservation.findMany({
+                where: { shopId },
+                include: { product: true },
+            });
+        }
+        catch (err) {
+            console.error('[ReservationsService.getShopCustomers] Error:', err?.message, 'shopId:', shopId);
+            return [];
+        }
         const customerMap = new Map();
         reservations.forEach(res => {
             const phone = res.customerPhone || 'Unknown';

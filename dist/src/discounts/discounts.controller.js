@@ -53,7 +53,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DiscountsController.prototype, "validateCode", null);
 __decorate([
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard, subscription_guard_1.SubscriptionGuard),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('SHOP_ADMIN'),
     (0, common_1.Get)(),
     __param(0, (0, common_1.Request)()),

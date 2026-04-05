@@ -25,9 +25,32 @@ async function bootstrap() {
 
   // CORS (for subdomain frontend access)
   app.enableCors({
-    origin: true,
+    origin: (origin, callback) => {
+      // Autoriser les requêtes sans origin (ex: mobile apps, Postman)
+      if (!origin) return callback(null, true);
+      
+      const allowedOrigins = [
+        // Vercel deployments
+        /\.vercel\.app$/,
+        // Brelness domain (tous les sous-domaines)
+        /\.brelness\.com$/,
+        'https://brelness.com',
+        'https://www.brelness.com',
+        // Développement local
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'http://localhost:3001',
+      ];
+
+      const isAllowed = allowedOrigins.some(pattern =>
+        pattern instanceof RegExp ? pattern.test(origin) : pattern === origin
+      );
+
+      callback(null, isAllowed);
+    },
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type,Authorization',
   });
 
   // Global prefix

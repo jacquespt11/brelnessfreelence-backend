@@ -19,9 +19,24 @@ async function bootstrap() {
     });
     app.useGlobalPipes(new common_1.ValidationPipe({ whitelist: true, transform: true }));
     app.enableCors({
-        origin: true,
+        origin: (origin, callback) => {
+            if (!origin)
+                return callback(null, true);
+            const allowedOrigins = [
+                /\.vercel\.app$/,
+                /\.brelness\.com$/,
+                'https://brelness.com',
+                'https://www.brelness.com',
+                'http://localhost:5173',
+                'http://localhost:3000',
+                'http://localhost:3001',
+            ];
+            const isAllowed = allowedOrigins.some(pattern => pattern instanceof RegExp ? pattern.test(origin) : pattern === origin);
+            callback(null, isAllowed);
+        },
         credentials: true,
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+        allowedHeaders: 'Content-Type,Authorization',
     });
     app.setGlobalPrefix('api');
     const config = new swagger_1.DocumentBuilder()

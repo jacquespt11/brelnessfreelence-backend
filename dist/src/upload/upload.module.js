@@ -9,11 +9,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UploadModule = void 0;
 const common_1 = require("@nestjs/common");
 const upload_controller_1 = require("./upload.controller");
+const cloudinary_module_1 = require("../cloudinary/cloudinary.module");
 let UploadModule = class UploadModule {
 };
 exports.UploadModule = UploadModule;
 exports.UploadModule = UploadModule = __decorate([
     (0, common_1.Module)({
+        imports: [cloudinary_module_1.CloudinaryModule],
         controllers: [upload_controller_1.UploadController],
     })
 ], UploadModule);

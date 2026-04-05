@@ -1,7 +1,6 @@
 import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
 import { IsString, IsNotEmpty } from 'class-validator';
-import * as fs from 'fs';
-import * as path from 'path';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 export class UploadBase64Dto {
   @IsString()
@@ -15,6 +14,8 @@ export class UploadBase64Dto {
 
 @Controller('upload')
 export class UploadController {
+  constructor(private readonly cloudinaryService: CloudinaryService) {}
+
   @Post()
   async uploadFile(@Body() body: UploadBase64Dto) {
     if (!body.data || !body.filename) {
@@ -27,23 +28,14 @@ export class UploadController {
       throw new HttpException('Invalid base64 Data URL', HttpStatus.BAD_REQUEST);
     }
     
-    const buffer = Buffer.from(matches[2], 'base64');
-    const extension = path.extname(body.filename) || '.jpg';
-    
-    // Generate safe name
-    const safeName = Date.now() + '-' + Math.round(Math.random() * 1E9) + extension;
-    
-    // Ensure directory exists
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
+    try {
+      const buffer = Buffer.from(matches[2], 'base64');
+      const result = await this.cloudinaryService.uploadImage(buffer);
+      
+      return { url: result.secure_url };
+    } catch (error) {
+      console.error('Upload Error:', error);
+      throw new HttpException('Failed to upload image', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    
-    const filePath = path.join(uploadsDir, safeName);
-    fs.writeFileSync(filePath, buffer);
-    
-    const url = `http://localhost:3001/public/uploads/${safeName}`;
-    
-    return { url };
   }
 }

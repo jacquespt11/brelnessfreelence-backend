@@ -62,9 +62,19 @@ let AuthController = class AuthController {
     register(body) {
         return this.authService.register(body.email, body.password, body.name);
     }
-    async googleAuth(req) { }
-    async googleAuthRedirect(req) {
-        return this.authService.issueToken(req.user);
+    async googleAuth(req, reply) {
+        const clientId = process.env.GOOGLE_CLIENT_ID;
+        if (!clientId || clientId === 'mock_client_id') {
+            reply.status(503).send({ message: 'Google OAuth non configuré. Ajoutez GOOGLE_CLIENT_ID dans les variables Railway.' });
+            return;
+        }
+        const callbackUrl = encodeURIComponent(process.env.GOOGLE_CALLBACK_URL || 'https://brelnessfreelence-backend-production.up.railway.app/api/auth/google/callback');
+        const scope = encodeURIComponent('email profile');
+        const googleUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${callbackUrl}&response_type=code&scope=${scope}&access_type=offline`;
+        reply.redirect(googleUrl);
+    }
+    async googleAuthRedirect(req, reply) {
+        reply.status(501).send({ message: 'Implémentation complète disponible après configuration Google Cloud Console.' });
     }
     findAll() {
         return this.authService.findAll();
@@ -103,21 +113,21 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "register", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Redirection vers la mire Google' }),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('google')),
+    (0, swagger_1.ApiOperation)({ summary: 'Redirection vers la mire Google (OAuth2)' }),
     (0, common_1.Get)('google'),
     __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "googleAuth", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Callback Google post-auth' }),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('google')),
     (0, common_1.Get)('google/callback'),
     __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "googleAuthRedirect", null);
 __decorate([

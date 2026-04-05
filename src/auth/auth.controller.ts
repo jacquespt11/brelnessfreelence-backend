@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Patch, Delete, Param, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Param, Body, UseGuards, Request, Res as Reply } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from './roles.guard';
@@ -45,18 +45,27 @@ export class AuthController {
     return this.authService.register(body.email, body.password, body.name);
   }
 
-  @ApiOperation({ summary: 'Redirection vers la mire Google' })
-  @UseGuards(AuthGuard('google'))
+  @ApiOperation({ summary: 'Redirection vers la mire Google (OAuth2)' })
   @Get('google')
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  async googleAuth(@Request() req: any) {}
+  async googleAuth(@Request() req: any, @Reply() reply: any) {
+    // Fastify ne supporte pas le redirect Passport nativement
+    // On redirige manuellement vers Google OAuth2
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    if (!clientId || clientId === 'mock_client_id') {
+      reply.status(503).send({ message: 'Google OAuth non configuré. Ajoutez GOOGLE_CLIENT_ID dans les variables Railway.' });
+      return;
+    }
+    const callbackUrl = encodeURIComponent(process.env.GOOGLE_CALLBACK_URL || 'https://brelnessfreelence-backend-production.up.railway.app/api/auth/google/callback');
+    const scope = encodeURIComponent('email profile');
+    const googleUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${callbackUrl}&response_type=code&scope=${scope}&access_type=offline`;
+    reply.redirect(googleUrl);
+  }
 
   @ApiOperation({ summary: 'Callback Google post-auth' })
-  @UseGuards(AuthGuard('google'))
   @Get('google/callback')
-  async googleAuthRedirect(@Request() req: any) {
-    // Si la stratégie Google valide l'utilisateur, on génère un token JWT
-    return this.authService.issueToken(req.user);
+  async googleAuthRedirect(@Request() req: any, @Reply() reply: any) {
+    // Ce callback sera implémenté correctement une fois GOOGLE_CLIENT_ID configuré
+    reply.status(501).send({ message: 'Implémentation complète disponible après configuration Google Cloud Console.' });
   }
 
   @ApiBearerAuth()

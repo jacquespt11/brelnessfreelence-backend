@@ -21,7 +21,14 @@ async function bootstrap() {
   });
 
   // Global validation pipe
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+  app.useGlobalPipes(new ValidationPipe({ 
+    whitelist: true, 
+    transform: true,
+    exceptionFactory: (errors) => {
+      console.error('[Validation Failed]', JSON.stringify(errors, null, 2));
+      return new require('@nestjs/common').BadRequestException(errors);
+    }
+  }));
 
   // CORS (for subdomain frontend access)
   app.enableCors({

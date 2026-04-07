@@ -17,7 +17,14 @@ async function bootstrap() {
         root: (0, path_1.join)(process.cwd(), 'public'),
         prefix: '/public/',
     });
-    app.useGlobalPipes(new common_1.ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(new common_1.ValidationPipe({
+        whitelist: true,
+        transform: true,
+        exceptionFactory: (errors) => {
+            console.error('[Validation Failed]', JSON.stringify(errors, null, 2));
+            return new require('@nestjs/common').BadRequestException(errors);
+        }
+    }));
     app.enableCors({
         origin: (origin, callback) => {
             if (!origin)

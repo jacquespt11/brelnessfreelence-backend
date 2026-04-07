@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import multipart from '@fastify/multipart';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { join } from 'path';
@@ -26,7 +26,7 @@ async function bootstrap() {
     transform: true,
     exceptionFactory: (errors) => {
       console.error('[Validation Failed]', JSON.stringify(errors, null, 2));
-      return new require('@nestjs/common').BadRequestException(errors);
+      return new BadRequestException(errors);
     }
   }));
 

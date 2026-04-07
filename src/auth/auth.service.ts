@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
 import { NotificationsGateway } from '../notifications/notifications.gateway';
+import { Resend } from 'resend';
 
 @Injectable()
 export class AuthService {
@@ -61,7 +62,8 @@ export class AuthService {
     const existing = await this.prisma.user.findUnique({ where: { email: data.email } });
     if (existing) throw new ConflictException('Email déjà utilisé');
 
-    const hashedPassword = await bcrypt.hash(data.password || 'password123', 10);
+    const rawPassword = data.password || 'password123';
+    const hashedPassword = await bcrypt.hash(rawPassword, 10);
     const user = await this.prisma.user.create({
       data: {
         email: data.email,
@@ -81,6 +83,31 @@ export class AuthService {
         type: 'system',
       }
     });
+
+    try {
+      if (process.env.RESEND_API_KEY) {
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        await resend.emails.send({
+          from: 'Brelness Support <contact@brelness.com>',
+          to: data.email,
+          subject: 'Vos accès Administrateur Brelness O.S',
+          html: `
+            <h2>Bienvenue sur Brelness, ${data.name} !</h2>
+            <p>Votre compte administrateur a été créé avec succès.</p>
+            <p>Voici vos identifiants pour accéder à votre interface de gestion :</p>
+            <div style="background-color:#f3f4f6;padding:16px;border-radius:8px;margin:16px 0;">
+              <p style="margin:4px 0;"><strong>E-mail :</strong> ${data.email}</p>
+              <p style="margin:4px 0;"><strong>Mot de passe :</strong> ${rawPassword}</p>
+            </div>
+            <p style="color:#d97706;"><strong>Important :</strong> Pour des raisons de sécurité, nous vous invitons fortement à modifier ce mot de passe par défaut dès votre première connexion.</p>
+            <br>
+            <a href="${process.env.FRONTEND_URL || 'https://brelness.com'}/login" style="display:inline-block;padding:12px 24px;background-color:#2563eb;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:bold;">Se connecter à la plateforme</a>
+          `,
+        });
+      }
+    } catch (e) {
+      console.error("Erreur lors de l'envoi de l'email Resend pour l'admin:", e);
+    }
 
     return user;
   }

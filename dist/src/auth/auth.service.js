@@ -48,6 +48,8 @@ const jwt_1 = require("@nestjs/jwt");
 const prisma_service_1 = require("../prisma/prisma.service");
 const bcrypt = __importStar(require("bcryptjs"));
 const notifications_gateway_1 = require("../notifications/notifications.gateway");
+const resend_1 = require("resend");
+const client_1 = require("@prisma/client");
 let AuthService = class AuthService {
     prisma;
     jwtService;
@@ -101,7 +103,8 @@ let AuthService = class AuthService {
         const existing = await this.prisma.user.findUnique({ where: { email: data.email } });
         if (existing)
             throw new common_1.ConflictException('Email déjà utilisé');
-        const hashedPassword = await bcrypt.hash(data.password || 'password123', 10);
+        const rawPassword = data.password || 'password123';
+        const hashedPassword = await bcrypt.hash(rawPassword, 10);
         const user = await this.prisma.user.create({
             data: {
                 email: data.email,
@@ -109,7 +112,7 @@ let AuthService = class AuthService {
                 name: data.name,
                 shopId: data.shopId,
                 status: data.status || 'active',
-                role: 'SHOP_ADMIN',
+                role: client_1.Role.SHOP_ADMIN,
             },
         });
         this.notifications.notifySuperAdmins('admin_created', user);
@@ -120,6 +123,35 @@ let AuthService = class AuthService {
                 type: 'system',
             }
         });
+        try {
+            if (process.env.RESEND_API_KEY) {
+                const resend = new resend_1.Resend(process.env.RESEND_API_KEY);
+                await resend.emails.send({
+                    from: 'Brelness Support <contact@brelness.com>',
+                    to: data.email,
+                    subject: 'Vos accès Administrateur Brelness O.S',
+                    html: `
+            <h2>Bienvenue sur Brelness, ${data.name} !</h2>
+            <p>Votre compte administrateur a été créé avec succès.</p>
+            <p>Voici vos identifiants pour accéder à votre interface de gestion :</p>
+            <div style="background-color:#f3f4f6;padding:16px;border-radius:8px;margin:16px 0;">
+              <p style="margin:4px 0;"><strong>E-mail :</strong> ${data.email}</p>
+              <p style="margin:4px 0;"><strong>Mot de passe :</strong> ${rawPassword}</p>
+            </div>
+            <p style="color:#d97706;"><strong>Important :</strong> Pour des raisons de sécurité, nous vous invitons fortement à modifier ce mot de passe par défaut dès votre première connexion.</p>
+            <br>
+            <a href="${process.env.FRONTEND_URL || 'https://brelness.com'}/login" style="display:inline-block;padding:12px 24px;background-color:#2563eb;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:bold;">Se connecter à la plateforme</a>
+          `,
+                });
+                console.log(`[Resend] E-mail de bienvenue envoyé avec succès à ${data.email}`);
+            }
+            else {
+                console.warn(`[Resend] RESEND_API_KEY manquante. E-mail non envoyé à ${data.email}.`);
+            }
+        }
+        catch (e) {
+            console.error(`[Resend] Erreur critique lors de l'envoi de l'email pour l'admin ${data.email}:`, e);
+        }
         return user;
     }
     async updateUser(id, data) {

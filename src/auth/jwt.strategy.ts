@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PrismaService } from '../prisma/prisma.service';
+import { ConfigService } from '@nestjs/config';
 
 export interface JwtPayload {
   sub: string;
@@ -12,11 +13,11 @@ export interface JwtPayload {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private prisma: PrismaService) {
+  constructor(private prisma: PrismaService, config: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET || 'brelness_secret_change_me',
+      secretOrKey: config.get<string>('JWT_SECRET') || 'brelness_secret_change_me',
     });
   }
 
@@ -27,7 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       select: { id: true, email: true, role: true, shopId: true, status: true }
     });
 
-    if (!user || user.status !== 'active') {
+    if (!user || user.status?.toLowerCase() !== 'active') {
       throw new UnauthorizedException('Compte inactif ou introuvable.');
     }
 

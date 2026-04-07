@@ -40,7 +40,7 @@ let ShopRequestsService = class ShopRequestsService {
         await this.prisma.notification.create({
             data: {
                 title: 'Nouvelle Demande de Plateforme',
-                message: `${data.name} souhaite créer la boutique "${data.businessName}".`,
+                message: `${data.name} (${data.email}) souhaite créer la boutique "${data.businessName}".`,
                 type: 'system',
             }
         });

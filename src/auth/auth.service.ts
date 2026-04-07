@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
 import { NotificationsGateway } from '../notifications/notifications.gateway';
 import { Resend } from 'resend';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -71,7 +72,7 @@ export class AuthService {
         name: data.name,
         shopId: data.shopId,
         status: data.status || 'active',
-        role: 'SHOP_ADMIN',
+        role: Role.SHOP_ADMIN,
       },
     });
 
@@ -104,9 +105,12 @@ export class AuthService {
             <a href="${process.env.FRONTEND_URL || 'https://brelness.com'}/login" style="display:inline-block;padding:12px 24px;background-color:#2563eb;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:bold;">Se connecter à la plateforme</a>
           `,
         });
+        console.log(`[Resend] E-mail de bienvenue envoyé avec succès à ${data.email}`);
+      } else {
+        console.warn(`[Resend] RESEND_API_KEY manquante. E-mail non envoyé à ${data.email}.`);
       }
     } catch (e) {
-      console.error("Erreur lors de l'envoi de l'email Resend pour l'admin:", e);
+      console.error(`[Resend] Erreur critique lors de l'envoi de l'email pour l'admin ${data.email}:`, e);
     }
 
     return user;

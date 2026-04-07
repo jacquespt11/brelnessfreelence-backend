@@ -22,7 +22,7 @@ async function bootstrap() {
         transform: true,
         exceptionFactory: (errors) => {
             console.error('[Validation Failed]', JSON.stringify(errors, null, 2));
-            return new require('@nestjs/common').BadRequestException(errors);
+            return new common_1.BadRequestException(errors);
         }
     }));
     app.enableCors({

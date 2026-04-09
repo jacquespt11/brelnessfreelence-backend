@@ -2,14 +2,18 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-  constructor(private prisma: PrismaService) {
+  constructor(
+    private prisma: PrismaService,
+    private configService: ConfigService
+  ) {
     super({
-      clientID: process.env.GOOGLE_CLIENT_ID || 'mock_client_id',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'mock_client_secret',
-      callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3001/api/auth/google/callback',
+      clientID: configService.get<string>('GOOGLE_CLIENT_ID') || 'mock_client_id',
+      clientSecret: configService.get<string>('GOOGLE_CLIENT_SECRET') || 'mock_client_secret',
+      callbackURL: configService.get<string>('GOOGLE_CALLBACK_URL') || 'http://localhost:3001/api/auth/google/callback',
       scope: ['email', 'profile'],
     });
   }

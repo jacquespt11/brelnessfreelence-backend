@@ -4,6 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from './roles.guard';
 import { Roles } from './roles.decorator';
 import { AuthService } from './auth.service';
+import { ConfigService } from '@nestjs/config';
 
 import { IsEmail, IsString, MinLength } from 'class-validator';
 
@@ -31,7 +32,10 @@ class RegisterDto {
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private configService: ConfigService
+  ) {}
 
   @ApiOperation({ summary: 'Connexion' })
   @Post('login')
@@ -47,25 +51,25 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Redirection vers la mire Google (OAuth2)' })
   @Get('google')
-  async googleAuth(@Request() req: any, @Reply() reply: any) {
-    // Fastify ne supporte pas le redirect Passport nativement
-    // On redirige manuellement vers Google OAuth2
-    const clientId = process.env.GOOGLE_CLIENT_ID;
-    if (!clientId || clientId === 'mock_client_id') {
-      reply.status(503).send({ message: 'Google OAuth non configuré. Ajoutez GOOGLE_CLIENT_ID dans les variables Railway.' });
-      return;
-    }
-    const callbackUrl = encodeURIComponent(process.env.GOOGLE_CALLBACK_URL || 'https://brelnessfreelence-backend-production.up.railway.app/api/auth/google/callback');
-    const scope = encodeURIComponent('email profile');
-    const googleUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${callbackUrl}&response_type=code&scope=${scope}&access_type=offline`;
-    reply.redirect(googleUrl);
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {
+    // Le garde manipule la redirection vers Google OAuth2 automatiquement.
   }
 
   @ApiOperation({ summary: 'Callback Google post-auth' })
   @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Request() req: any, @Reply() reply: any) {
-    // Ce callback sera implémenté correctement une fois GOOGLE_CLIENT_ID configuré
-    reply.status(501).send({ message: 'Implémentation complète disponible après configuration Google Cloud Console.' });
+    // Si l'utilisateur est authentifié par GoogleStrategy, req.user contient l'objet User BDD.
+    const { access_token, user } = this.authService.issueToken(req.user);
+    
+    const frontendUrl = this.configService.get('FRONTEND_URL') || 'https://brelness.com';
+    const userJson = JSON.stringify({ ...user, token: access_token });
+    const encodedUser = encodeURIComponent(userJson);
+
+    // Redirection vers le frontend en injectant les données dans un paramètre d'URL.
+    // Le Frontend extraira ces données et les mettra dans le localStorage.
+    reply.redirect(`${frontendUrl}/login?oauth_data=${encodedUser}`);
   }
 
   @ApiBearerAuth()

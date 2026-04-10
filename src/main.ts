@@ -13,6 +13,16 @@ async function bootstrap() {
   );
 
   await app.register(multipart, { attachFieldsToBody: 'keyValues' });
+  
+  await app.register(require('@fastify/secure-session'), {
+    secret: 'une_super_clef_longue_et_securisee_de_32_caracteres_minimum',
+    salt: 'mq9hDxBVDbspDR6n',
+    cookie: {
+      path: '/',
+      secure: false, // Passer à true en prod si HTTPS strict exigé pour le frontend
+      httpOnly: true,
+    }
+  });
 
   // Serve static files from the public folder (uploaded images)
   await app.register(require('@fastify/static'), {

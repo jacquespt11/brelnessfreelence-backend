@@ -54,6 +54,26 @@ export class AuthService {
     };
   }
 
+  async loginOrCreateGoogleUser(email: string, profile: any) {
+    // Chercher l'utilisateur en BDD par son email Google
+    let user = await this.prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+      // Créer le compte automatiquement si ce n'est pas un super admin existant
+      // Vous pouvez changer cette logique pour refuser les inconnus si nécessaire
+      throw new UnauthorizedException(
+        'Accès refusé. Votre compte Google n\'est pas associé à un compte Brelness. Contactez votre administrateur.'
+      );
+    }
+
+    if (user.status.toLowerCase() !== 'active') {
+      throw new UnauthorizedException('Votre compte est désactivé.');
+    }
+
+    return this.issueToken(user);
+  }
+
+
   async findAll() {
     return this.prisma.user.findMany({
       include: { shop: true },

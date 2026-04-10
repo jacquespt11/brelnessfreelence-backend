@@ -5,6 +5,7 @@ import * as bcrypt from 'bcryptjs';
 import { NotificationsGateway } from '../notifications/notifications.gateway';
 import { Resend } from 'resend';
 import { Role } from '@prisma/client';
+import { EmessService } from '../emess/emess.service';
 
 @Injectable()
 export class AuthService {
@@ -12,6 +13,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private notifications: NotificationsGateway,
+    private emessService: EmessService,
   ) {}
 
   async register(email: string, password: string, name: string) {
@@ -59,7 +61,7 @@ export class AuthService {
     });
   }
 
-  async createUser(data: { name: string; email: string; password?: string; shopId?: string; status?: string }) {
+  async createUser(data: { name: string; email: string; password?: string; shopId?: string; status?: string; phone?: string }) {
     const existing = await this.prisma.user.findUnique({ where: { email: data.email } });
     if (existing) throw new ConflictException('Email déjà utilisé');
 
@@ -70,6 +72,7 @@ export class AuthService {
         email: data.email,
         password: hashedPassword,
         name: data.name,
+        phone: data.phone,
         shopId: data.shopId,
         status: data.status || 'active',
         role: Role.SHOP_ADMIN,
@@ -111,6 +114,14 @@ export class AuthService {
       }
     } catch (e) {
       console.error(`[Resend] Erreur critique lors de l'envoi de l'email pour l'admin ${data.email}:`, e);
+    }
+
+    if (data.phone) {
+      try {
+        await this.emessService.sendAdminCredentialsSms(data.phone, data.name, data.email, rawPassword);
+      } catch (e) {
+        console.error(`[Emess] Échec de l'envoi du SMS d'accès à ${data.phone}:`, e);
+      }
     }
 
     return user;

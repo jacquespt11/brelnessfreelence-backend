@@ -17,11 +17,13 @@ import { TicketsModule } from './tickets/tickets.module';
 import { TasksModule } from './tasks/tasks.module';
 import { DiscountsModule } from './discounts/discounts.module';
 import { ShopRequestsModule } from './shop-requests/shop-requests.module';
+import { EmessModule } from './emess/emess.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
+    EmessModule,
     AuthModule,
     ShopsModule,
     ProductsModule,

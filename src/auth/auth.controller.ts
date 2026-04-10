@@ -69,7 +69,7 @@ export class AuthController {
       access_type: 'offline',
     });
 
-    reply.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
+    reply.status(302).redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
   }
 
   @ApiOperation({ summary: 'Callback Google OAuth2 - échange du code et émission du JWT' })
@@ -78,7 +78,7 @@ export class AuthController {
     const frontendUrl = this.configService.get('FRONTEND_URL') || 'https://brelness.com';
 
     if (!code) {
-      reply.redirect(`${frontendUrl}/login?error=google_auth_failed`);
+      reply.status(302).redirect(`${frontendUrl}/login?error=google_auth_failed`);
       return;
     }
 
@@ -106,13 +106,13 @@ export class AuthController {
       const { email } = profileRes.data;
       const { access_token, user } = await this.authService.loginOrCreateGoogleUser(email, profileRes.data);
 
-      // 3. Rediriger vers le frontend avec les données de session
+      // 3. Rediriger vers le frontend avec les donnees de session
       const userJson = JSON.stringify({ ...user, token: access_token });
-      reply.redirect(`${frontendUrl}/login?oauth_data=${encodeURIComponent(userJson)}`);
+      reply.status(302).redirect(`${frontendUrl}/login?oauth_data=${encodeURIComponent(userJson)}`);
 
     } catch (err: any) {
       console.error('[Google OAuth Callback Error]', err.response?.data || err.message);
-      reply.redirect(`${frontendUrl}/login?error=google_auth_failed`);
+      reply.status(302).redirect(`${frontendUrl}/login?error=google_auth_failed`);
     }
   }
 

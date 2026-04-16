@@ -17,6 +17,7 @@ const jwt_strategy_1 = require("./jwt.strategy");
 const google_strategy_1 = require("./google.strategy");
 const notifications_module_1 = require("../notifications/notifications.module");
 const prisma_module_1 = require("../prisma/prisma.module");
+const emess_module_1 = require("../emess/emess.module");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -24,6 +25,7 @@ exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
             passport_1.PassportModule,
+            emess_module_1.EmessModule,
             jwt_1.JwtModule.registerAsync({
                 inject: [config_1.ConfigService],
                 useFactory: (config) => ({

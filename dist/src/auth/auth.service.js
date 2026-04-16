@@ -50,14 +50,17 @@ const bcrypt = __importStar(require("bcryptjs"));
 const notifications_gateway_1 = require("../notifications/notifications.gateway");
 const resend_1 = require("resend");
 const client_1 = require("@prisma/client");
+const emess_service_1 = require("../emess/emess.service");
 let AuthService = class AuthService {
     prisma;
     jwtService;
     notifications;
-    constructor(prisma, jwtService, notifications) {
+    emessService;
+    constructor(prisma, jwtService, notifications, emessService) {
         this.prisma = prisma;
         this.jwtService = jwtService;
         this.notifications = notifications;
+        this.emessService = emessService;
     }
     async register(email, password, name) {
         const existing = await this.prisma.user.findUnique({ where: { email } });
@@ -93,6 +96,16 @@ let AuthService = class AuthService {
             user: { id: user.id, email: user.email, name: user.name, role: user.role, shopId: user.shopId },
         };
     }
+    async loginOrCreateGoogleUser(email, profile) {
+        let user = await this.prisma.user.findUnique({ where: { email } });
+        if (!user) {
+            throw new common_1.UnauthorizedException('Accès refusé. Votre compte Google n\'est pas associé à un compte Brelness. Contactez votre administrateur.');
+        }
+        if (user.status.toLowerCase() !== 'active') {
+            throw new common_1.UnauthorizedException('Votre compte est désactivé.');
+        }
+        return this.issueToken(user);
+    }
     async findAll() {
         return this.prisma.user.findMany({
             include: { shop: true },
@@ -110,6 +123,7 @@ let AuthService = class AuthService {
                 email: data.email,
                 password: hashedPassword,
                 name: data.name,
+                phone: data.phone,
                 shopId: data.shopId,
                 status: data.status || 'active',
                 role: client_1.Role.SHOP_ADMIN,
@@ -151,6 +165,14 @@ let AuthService = class AuthService {
         }
         catch (e) {
             console.error(`[Resend] Erreur critique lors de l'envoi de l'email pour l'admin ${data.email}:`, e);
+        }
+        if (data.phone) {
+            try {
+                await this.emessService.sendAdminCredentialsSms(data.phone, data.name, data.email, rawPassword);
+            }
+            catch (e) {
+                console.error(`[Emess] Échec de l'envoi du SMS d'accès à ${data.phone}:`, e);
+            }
         }
         return user;
     }
@@ -209,6 +231,7 @@ exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
         jwt_1.JwtService,
-        notifications_gateway_1.NotificationsGateway])
+        notifications_gateway_1.NotificationsGateway,
+        emess_service_1.EmessService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

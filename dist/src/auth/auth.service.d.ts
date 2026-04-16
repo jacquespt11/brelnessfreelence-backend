@@ -1,11 +1,13 @@
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsGateway } from '../notifications/notifications.gateway';
+import { EmessService } from '../emess/emess.service';
 export declare class AuthService {
     private prisma;
     private jwtService;
     private notifications;
-    constructor(prisma: PrismaService, jwtService: JwtService, notifications: NotificationsGateway);
+    private emessService;
+    constructor(prisma: PrismaService, jwtService: JwtService, notifications: NotificationsGateway, emessService: EmessService);
     register(email: string, password: string, name: string): Promise<{
         access_token: string;
         user: {
@@ -36,6 +38,16 @@ export declare class AuthService {
             shopId: any;
         };
     };
+    loginOrCreateGoogleUser(email: string, profile: any): Promise<{
+        access_token: string;
+        user: {
+            id: any;
+            email: any;
+            name: any;
+            role: any;
+            shopId: any;
+        };
+    }>;
     findAll(): Promise<({
         shop: {
             id: string;
@@ -79,6 +91,7 @@ export declare class AuthService {
         password?: string;
         shopId?: string;
         status?: string;
+        phone?: string;
     }): Promise<{
         id: string;
         email: string;

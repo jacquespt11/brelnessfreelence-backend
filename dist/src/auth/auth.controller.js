@@ -11,14 +11,19 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const passport_1 = require("@nestjs/passport");
 const roles_guard_1 = require("./roles.guard");
+const axios_1 = __importDefault(require("axios"));
 const roles_decorator_1 = require("./roles.decorator");
 const auth_service_1 = require("./auth.service");
+const config_1 = require("@nestjs/config");
 const class_validator_1 = require("class-validator");
 class LoginDto {
     email;
@@ -53,8 +58,10 @@ __decorate([
 ], RegisterDto.prototype, "name", void 0);
 let AuthController = class AuthController {
     authService;
-    constructor(authService) {
+    configService;
+    constructor(authService, configService) {
         this.authService = authService;
+        this.configService = configService;
     }
     login(body) {
         return this.authService.login(body.email, body.password);
@@ -62,19 +69,52 @@ let AuthController = class AuthController {
     register(body) {
         return this.authService.register(body.email, body.password, body.name);
     }
-    async googleAuth(req, reply) {
-        const clientId = process.env.GOOGLE_CLIENT_ID;
+    async googleAuth(reply) {
+        const clientId = this.configService.get('GOOGLE_CLIENT_ID');
+        const callbackUrl = this.configService.get('GOOGLE_CALLBACK_URL') || 'https://brelnessfreelence-backend-production.up.railway.app/api/auth/google/callback';
         if (!clientId || clientId === 'mock_client_id') {
             reply.status(503).send({ message: 'Google OAuth non configuré. Ajoutez GOOGLE_CLIENT_ID dans les variables Railway.' });
             return;
         }
-        const callbackUrl = encodeURIComponent(process.env.GOOGLE_CALLBACK_URL || 'https://brelnessfreelence-backend-production.up.railway.app/api/auth/google/callback');
-        const scope = encodeURIComponent('email profile');
-        const googleUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${callbackUrl}&response_type=code&scope=${scope}&access_type=offline`;
-        reply.redirect(googleUrl);
+        const params = new URLSearchParams({
+            client_id: clientId,
+            redirect_uri: callbackUrl,
+            response_type: 'code',
+            scope: 'email profile',
+            access_type: 'offline',
+        });
+        reply.status(302).redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
     }
-    async googleAuthRedirect(req, reply) {
-        reply.status(501).send({ message: 'Implémentation complète disponible après configuration Google Cloud Console.' });
+    async googleAuthRedirect(code, reply) {
+        const frontendUrl = this.configService.get('FRONTEND_URL') || 'https://brelness.com';
+        if (!code) {
+            reply.status(302).redirect(`${frontendUrl}/login?error=google_auth_failed`);
+            return;
+        }
+        try {
+            const clientId = this.configService.get('GOOGLE_CLIENT_ID');
+            const clientSecret = this.configService.get('GOOGLE_CLIENT_SECRET');
+            const callbackUrl = this.configService.get('GOOGLE_CALLBACK_URL') || 'https://brelnessfreelence-backend-production.up.railway.app/api/auth/google/callback';
+            const tokenRes = await axios_1.default.post('https://oauth2.googleapis.com/token', {
+                code,
+                client_id: clientId,
+                client_secret: clientSecret,
+                redirect_uri: callbackUrl,
+                grant_type: 'authorization_code',
+            });
+            const googleAccessToken = tokenRes.data.access_token;
+            const profileRes = await axios_1.default.get('https://www.googleapis.com/oauth2/v2/userinfo', {
+                headers: { Authorization: `Bearer ${googleAccessToken}` },
+            });
+            const { email } = profileRes.data;
+            const { access_token, user } = await this.authService.loginOrCreateGoogleUser(email, profileRes.data);
+            const userJson = JSON.stringify({ ...user, token: access_token });
+            reply.status(302).redirect(`${frontendUrl}/login?oauth_data=${encodeURIComponent(userJson)}`);
+        }
+        catch (err) {
+            console.error('[Google OAuth Callback Error]', err.response?.data || err.message);
+            reply.status(302).redirect(`${frontendUrl}/login?error=google_auth_failed`);
+        }
     }
     findAll() {
         return this.authService.findAll();
@@ -113,21 +153,20 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "register", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Redirection vers la mire Google (OAuth2)' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Redirection manuelle vers Google OAuth2 (Fastify-compatible)' }),
     (0, common_1.Get)('google'),
-    __param(0, (0, common_1.Request)()),
-    __param(1, (0, common_1.Res)()),
+    __param(0, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "googleAuth", null);
 __decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'Callback Google post-auth' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Callback Google OAuth2 - échange du code et émission du JWT' }),
     (0, common_1.Get)('google/callback'),
-    __param(0, (0, common_1.Request)()),
+    __param(0, (0, common_1.Query)('code')),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "googleAuthRedirect", null);
 __decorate([
@@ -198,6 +237,7 @@ __decorate([
 exports.AuthController = AuthController = __decorate([
     (0, swagger_1.ApiTags)('auth'),
     (0, common_1.Controller)('auth'),
-    __metadata("design:paramtypes", [auth_service_1.AuthService])
+    __metadata("design:paramtypes", [auth_service_1.AuthService,
+        config_1.ConfigService])
 ], AuthController);
 //# sourceMappingURL=auth.controller.js.map

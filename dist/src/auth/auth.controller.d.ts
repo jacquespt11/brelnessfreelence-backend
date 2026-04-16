@@ -1,4 +1,5 @@
 import { AuthService } from './auth.service';
+import { ConfigService } from '@nestjs/config';
 declare class LoginDto {
     email: string;
     password: string;
@@ -10,7 +11,8 @@ declare class RegisterDto {
 }
 export declare class AuthController {
     private authService;
-    constructor(authService: AuthService);
+    private configService;
+    constructor(authService: AuthService, configService: ConfigService);
     login(body: LoginDto): Promise<{
         access_token: string;
         user: {
@@ -31,8 +33,8 @@ export declare class AuthController {
             shopId: any;
         };
     }>;
-    googleAuth(req: any, reply: any): Promise<void>;
-    googleAuthRedirect(req: any, reply: any): Promise<void>;
+    googleAuth(reply: any): Promise<void>;
+    googleAuthRedirect(code: string, reply: any): Promise<void>;
     findAll(): Promise<({
         shop: {
             id: string;

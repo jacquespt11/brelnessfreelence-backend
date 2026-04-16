@@ -14,16 +14,20 @@ const passport_1 = require("@nestjs/passport");
 const passport_google_oauth20_1 = require("passport-google-oauth20");
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const config_1 = require("@nestjs/config");
 let GoogleStrategy = class GoogleStrategy extends (0, passport_1.PassportStrategy)(passport_google_oauth20_1.Strategy, 'google') {
     prisma;
-    constructor(prisma) {
+    configService;
+    constructor(prisma, configService) {
         super({
-            clientID: process.env.GOOGLE_CLIENT_ID || 'mock_client_id',
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'mock_client_secret',
-            callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3001/api/auth/google/callback',
+            clientID: configService.get('GOOGLE_CLIENT_ID') || 'mock_client_id',
+            clientSecret: configService.get('GOOGLE_CLIENT_SECRET') || 'mock_client_secret',
+            callbackURL: configService.get('GOOGLE_CALLBACK_URL') || 'http://localhost:3001/api/auth/google/callback',
             scope: ['email', 'profile'],
+            state: false,
         });
         this.prisma = prisma;
+        this.configService = configService;
     }
     async validate(accessToken, refreshToken, profile, done) {
         const { emails } = profile;
@@ -41,6 +45,7 @@ let GoogleStrategy = class GoogleStrategy extends (0, passport_1.PassportStrateg
 exports.GoogleStrategy = GoogleStrategy;
 exports.GoogleStrategy = GoogleStrategy = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        config_1.ConfigService])
 ], GoogleStrategy);
 //# sourceMappingURL=google.strategy.js.map

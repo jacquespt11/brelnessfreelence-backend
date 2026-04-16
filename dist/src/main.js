@@ -13,6 +13,15 @@ const path_1 = require("path");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule, new platform_fastify_1.FastifyAdapter({ logger: true, bodyLimit: 30 * 1024 * 1024 }));
     await app.register(multipart_1.default, { attachFieldsToBody: 'keyValues' });
+    await app.register(require('@fastify/secure-session'), {
+        secret: 'une_super_clef_longue_et_securisee_de_32_caracteres_minimum',
+        salt: 'mq9hDxBVDbspDR6n',
+        cookie: {
+            path: '/',
+            secure: false,
+            httpOnly: true,
+        }
+    });
     await app.register(require('@fastify/static'), {
         root: (0, path_1.join)(process.cwd(), 'public'),
         prefix: '/public/',

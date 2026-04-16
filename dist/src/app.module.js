@@ -26,6 +26,7 @@ const tickets_module_1 = require("./tickets/tickets.module");
 const tasks_module_1 = require("./tasks/tasks.module");
 const discounts_module_1 = require("./discounts/discounts.module");
 const shop_requests_module_1 = require("./shop-requests/shop-requests.module");
+const emess_module_1 = require("./emess/emess.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -34,6 +35,7 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             config_1.ConfigModule.forRoot({ isGlobal: true }),
             prisma_module_1.PrismaModule,
+            emess_module_1.EmessModule,
             auth_module_1.AuthModule,
             shops_module_1.ShopsModule,
             products_module_1.ProductsModule,

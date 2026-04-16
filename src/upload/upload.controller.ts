@@ -31,9 +31,15 @@ export class UploadController {
     try {
       const result = await this.cloudinaryService.uploadBase64(body.data);
       return { url: result.secure_url };
-    } catch (error) {
-      console.error('Upload Error:', error);
-      throw new HttpException('Failed to upload image', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (error: any) {
+      console.error('Upload Error Details:', error?.message || error);
+      if (error?.http_code) {
+        console.error('Cloudinary HTTP Code:', error.http_code);
+      }
+      throw new HttpException(
+        'Failed to upload image. Please check Cloudinary configuration.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 }

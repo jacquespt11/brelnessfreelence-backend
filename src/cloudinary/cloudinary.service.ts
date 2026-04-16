@@ -3,6 +3,10 @@ import { v2 as cloudinary, UploadApiResponse, UploadApiErrorResponse } from 'clo
 
 @Injectable()
 export class CloudinaryService {
+  async uploadBase64(dataUri: string): Promise<UploadApiResponse> {
+    return cloudinary.uploader.upload(dataUri, { folder: 'brelness' });
+  }
+
   async uploadImage(
     fileBuffer: Buffer,
   ): Promise<UploadApiResponse | UploadApiErrorResponse> {

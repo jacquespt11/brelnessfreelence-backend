@@ -29,9 +29,7 @@ export class UploadController {
     }
     
     try {
-      const buffer = Buffer.from(matches[2], 'base64');
-      const result = await this.cloudinaryService.uploadImage(buffer);
-      
+      const result = await this.cloudinaryService.uploadBase64(body.data);
       return { url: result.secure_url };
     } catch (error) {
       console.error('Upload Error:', error);
